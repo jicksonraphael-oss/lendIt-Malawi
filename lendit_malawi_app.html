@@ -1,0 +1,525 @@
+
+<style>
+:root{--la:#C8861E;--la-l:#F8EDD6;--la-d:#8B5E0F;--lg:#275C35;--lg-l:#E4F0E8;--lb:#1B6B8A;--lb-l:#DDF0F7;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--color-background-tertiary);color:var(--color-text-primary);}
+button{cursor:pointer;font-family:system-ui,sans-serif;}
+.nav{background:var(--lg);padding:0 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--la);flex-wrap:wrap;gap:4px;}
+.brand{font-family:Georgia,serif;font-size:18px;color:#fff;padding:10px 0;letter-spacing:-0.3px;}
+.brand em{color:var(--la);font-style:normal;}
+.nav-links{display:flex;gap:2px;align-items:center;flex-wrap:wrap;padding:4px 0;}
+.nlink{color:rgba(255,255,255,0.75);background:none;border:none;padding:7px 10px;font-size:13px;border-radius:6px;transition:all 0.15s;}
+.nlink:hover{color:#fff;background:rgba(255,255,255,0.15);}
+.nlink.on{color:var(--la);background:rgba(200,134,30,0.2);}
+.lang-btn{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:20px;font-size:12px;margin-left:6px;}
+.lang-btn:hover{background:rgba(255,255,255,0.25);}
+.view{display:none;}
+.view.on{display:block;}
+.hero{background:linear-gradient(135deg,#1a3d25 0%,var(--lg) 50%,#0f4a2e 100%);padding:3rem 1.5rem;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(200,134,30,0.12);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-80px;left:-40px;width:250px;height:250px;border-radius:50%;background:rgba(27,107,138,0.1);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(200,134,30,0.25);color:var(--la);border:1px solid rgba(200,134,30,0.4);padding:4px 14px;border-radius:20px;font-size:12px;margin-bottom:1rem;letter-spacing:1px;text-transform:uppercase;}
+.hero-h{font-family:Georgia,serif;font-size:2rem;color:#fff;line-height:1.25;margin-bottom:0.75rem;}
+.hero-h em{color:var(--la);font-style:normal;}
+.hero-sub{color:rgba(255,255,255,0.75);font-size:1rem;margin-bottom:1.75rem;line-height:1.6;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-p{background:var(--la);color:#fff;border:none;padding:11px 24px;border-radius:25px;font-size:14px;font-weight:500;transition:all 0.15s;}
+.btn-p:hover{background:var(--la-d);transform:translateY(-1px);}
+.btn-s{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.45);padding:11px 24px;border-radius:25px;font-size:14px;font-weight:500;transition:all 0.15s;}
+.btn-s:hover{border-color:#fff;background:rgba(255,255,255,0.1);}
+.stats{display:flex;justify-content:center;gap:2rem;background:var(--color-background-primary);padding:1rem;border-bottom:0.5px solid var(--color-border-tertiary);flex-wrap:wrap;}
+.snum{font-family:Georgia,serif;font-size:1.5rem;color:var(--la);text-align:center;}
+.slbl{font-size:11px;color:var(--color-text-secondary);text-align:center;}
+.sec{max-width:960px;margin:0 auto;padding:2rem 1rem;}
+.sec-h{font-family:Georgia,serif;font-size:1.4rem;color:var(--color-text-primary);margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;}
+.sec-h::after{content:'';flex:1;height:1px;background:var(--color-border-tertiary);}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;}
+.step{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:1.5rem;text-align:center;border-top:3px solid var(--la);}
+.step-n{width:32px;height:32px;border-radius:50%;background:var(--la-l);color:var(--la-d);font-weight:bold;font-size:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;}
+.step-t{font-weight:500;font-size:14px;margin-bottom:6px;}
+.step-d{font-size:13px;color:var(--color-text-secondary);line-height:1.5;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-left:3px solid var(--la);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.2s;}
+.card:hover{border-color:var(--la);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+.card-ico{background:var(--lg-l);padding:1.25rem;text-align:center;font-size:2.5rem;}
+.card-body{padding:0.9rem;}
+.card-name{font-weight:500;font-size:14px;margin-bottom:3px;}
+.card-loc{font-size:11px;color:var(--color-text-secondary);margin-bottom:6px;}
+.card-price{font-family:Georgia,serif;font-size:17px;color:var(--la-d);font-weight:bold;}
+.card-price span{font-size:11px;color:var(--color-text-secondary);font-family:system-ui,sans-serif;font-weight:normal;}
+.cat-tag{display:inline-block;background:var(--lg-l);color:var(--lg);font-size:11px;padding:3px 8px;border-radius:12px;margin-top:6px;}
+.pay-tag{display:inline-block;background:var(--lb-l);color:var(--lb);font-size:11px;padding:3px 8px;border-radius:12px;margin-top:4px;margin-left:4px;}
+.sb{display:flex;gap:8px;margin-bottom:1rem;}
+.si{flex:1;padding:9px 14px;border:1px solid var(--color-border-secondary);border-radius:8px;font-size:14px;background:var(--color-background-primary);color:var(--color-text-primary);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;}
+.chip{padding:6px 14px;border-radius:20px;font-size:12px;border:1px solid var(--color-border-tertiary);background:var(--color-background-primary);color:var(--color-text-secondary);transition:all 0.15s;}
+.chip.on{background:var(--la);color:#fff;border-color:var(--la);}
+.no-res{text-align:center;color:var(--color-text-secondary);padding:3rem;font-size:15px;}
+.back-btn{background:none;border:none;color:var(--lg);font-size:14px;display:flex;align-items:center;gap:6px;margin-bottom:1rem;padding:0;}
+.dcard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;overflow:hidden;}
+.d-ico{background:var(--lg-l);padding:2.5rem;text-align:center;font-size:5rem;}
+.d-body{padding:1.5rem;}
+.d-title{font-family:Georgia,serif;font-size:1.5rem;margin-bottom:0.5rem;}
+.d-price{font-family:Georgia,serif;font-size:1.8rem;color:var(--la-d);font-weight:bold;margin-bottom:1rem;}
+.d-info{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.d-info-i label{display:block;font-size:11px;color:var(--color-text-secondary);margin-bottom:3px;}
+.d-info-i p{font-weight:500;font-size:14px;}
+.d-desc{color:var(--color-text-secondary);line-height:1.75;font-size:14px;margin-bottom:1.5rem;}
+.pay-box{background:var(--lg-l);border:1px solid rgba(39,92,53,0.2);border-radius:8px;padding:1rem;margin-bottom:1.5rem;}
+.pay-box-t{font-weight:500;font-size:13px;color:var(--lg);margin-bottom:6px;}
+.pay-box p{font-size:13px;color:var(--color-text-secondary);}
+.borrow-section{background:var(--la-l);border:1px solid rgba(200,134,30,0.3);border-radius:8px;padding:1.25rem;margin-bottom:1rem;display:none;}
+.borrow-section.on{display:block;}
+.borrow-section h4{color:var(--la-d);margin-bottom:8px;font-size:14px;}
+.borrow-section p{font-size:13px;color:var(--color-text-secondary);margin-bottom:4px;}
+.borrow-section .phone{font-size:1.2rem;font-weight:bold;color:var(--la-d);font-family:Georgia,serif;}
+.borrow-btn{width:100%;background:var(--lg);color:#fff;border:none;padding:13px;border-radius:25px;font-size:15px;font-weight:500;transition:all 0.15s;}
+.borrow-btn:hover{background:#1a3d25;}
+.fcard{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:12px;padding:2rem;max-width:580px;margin:0 auto;}
+.f-title{font-family:Georgia,serif;font-size:1.3rem;margin-bottom:1.5rem;}
+.fg{margin-bottom:1.1rem;}
+.fl{display:block;font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:5px;}
+.fi,.fs,.fta{width:100%;padding:9px 13px;border:1px solid var(--color-border-secondary);border-radius:8px;font-size:14px;background:var(--color-background-primary);color:var(--color-text-primary);font-family:system-ui,sans-serif;}
+.fta{min-height:90px;resize:vertical;}
+.fs-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.fsub{width:100%;background:var(--la);color:#fff;border:none;padding:13px;border-radius:25px;font-size:15px;font-weight:500;transition:all 0.15s;margin-top:0.5rem;}
+.fsub:hover{background:var(--la-d);}
+.success{background:var(--lg-l);border:1px solid rgba(39,92,53,0.3);border-radius:8px;padding:1rem 1.5rem;text-align:center;color:var(--lg);font-weight:500;margin-bottom:1.5rem;display:none;}
+.success.on{display:block;}
+.empty{text-align:center;padding:3rem 1rem;color:var(--color-text-secondary);}
+.empty-ico{font-size:3rem;margin-bottom:1rem;}
+.my-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-left:3px solid var(--lg);border-radius:12px;padding:1rem;display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem;}
+.my-card-ico{font-size:2rem;background:var(--lg-l);padding:0.75rem;border-radius:8px;}
+.my-card-info{flex:1;}
+.my-card-name{font-weight:500;font-size:14px;}
+.my-card-price{font-size:13px;color:var(--la-d);}
+.my-card-badge{font-size:11px;background:var(--lg-l);color:var(--lg);padding:3px 8px;border-radius:12px;}
+.footer{background:var(--lg);color:rgba(255,255,255,0.6);text-align:center;font-size:12px;padding:1.5rem;margin-top:2rem;}
+.footer strong{color:var(--la);}
+</style>
+
+<nav class="nav">
+  <div class="brand">Lend<em>It</em> Malawi</div>
+  <div class="nav-links">
+    <button class="nlink on" onclick="nav('home')" id="n-home">🏠 <span class="nt" data-k="home"></span></button>
+    <button class="nlink" onclick="nav('browse')" id="n-browse">🔍 <span class="nt" data-k="browse"></span></button>
+    <button class="nlink" onclick="nav('list')" id="n-list">➕ <span class="nt" data-k="listAsset"></span></button>
+    <button class="nlink" onclick="nav('mine')" id="n-mine">📦 <span class="nt" data-k="myListings"></span></button>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn">🌐 EN</button>
+  </div>
+</nav>
+
+<div id="v-home" class="view on">
+  <div class="hero">
+    <div class="hero-tag">🇲🇼 Made for Malawi</div>
+    <h1 class="hero-h"><span data-k="heroLine1"></span><br><em><span data-k="heroLine2"></span></em></h1>
+    <p class="hero-sub" data-k="heroSub"></p>
+    <div class="hero-btns">
+      <button class="btn-p" onclick="nav('browse')"><span data-k="heroBrowse"></span></button>
+      <button class="btn-s" onclick="nav('list')"><span data-k="heroList"></span></button>
+    </div>
+  </div>
+  <div class="stats">
+    <div><div class="snum" id="stat-count">8</div><div class="slbl" data-k="statListings"></div></div>
+    <div><div class="snum">5</div><div class="slbl" data-k="statCities"></div></div>
+    <div><div class="snum">MK 300+</div><div class="slbl" data-k="statSave"></div></div>
+    <div><div class="snum">📱</div><div class="slbl" data-k="statPay"></div></div>
+  </div>
+  <div class="sec">
+    <h2 class="sec-h" data-k="howItWorks"></h2>
+    <div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-t" data-k="s1t"></div><div class="step-d" data-k="s1d"></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t" data-k="s2t"></div><div class="step-d" data-k="s2d"></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t" data-k="s3t"></div><div class="step-d" data-k="s3d"></div></div>
+    </div>
+  </div>
+  <div class="sec" style="padding-top:0">
+    <h2 class="sec-h" data-k="featured"></h2>
+    <div class="grid" id="home-grid"></div>
+  </div>
+  <footer class="footer"><strong>LendIt Malawi</strong> — <span data-k="footerLine"></span></footer>
+</div>
+
+<div id="v-browse" class="view">
+  <div class="sec">
+    <div class="sb">
+      <input class="si" id="search-input" oninput="applyFilters()" data-ph="search" placeholder="">
+    </div>
+    <div class="chips" id="chips"></div>
+    <div id="results-count" style="font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem;"></div>
+    <div class="grid" id="browse-grid"></div>
+  </div>
+</div>
+
+<div id="v-list" class="view">
+  <div class="sec">
+    <div class="success on" id="success-msg"></div>
+    <div class="fcard">
+      <h2 class="f-title" data-k="listTitle"></h2>
+      <div class="fg"><label class="fl" data-k="fName"></label><input class="fi" id="f-name" type="text"></div>
+      <div class="fg"><label class="fl" data-k="fDesc"></label><textarea class="fta" id="f-desc"></textarea></div>
+      <div class="fs-row">
+        <div class="fg"><label class="fl" data-k="fPrice"></label><input class="fi" id="f-price" type="number" min="100" placeholder="MK"></div>
+        <div class="fg"><label class="fl" data-k="fCat"></label>
+          <select class="fs" id="f-cat">
+            <option value="garden" data-k="catGarden"></option>
+            <option value="tools" data-k="catTools"></option>
+            <option value="kitchen" data-k="catKitchen"></option>
+            <option value="electronics" data-k="catElec"></option>
+            <option value="transport" data-k="catTransport"></option>
+            <option value="events" data-k="catEvents"></option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl" data-k="fLoc"></label><input class="fi" id="f-loc" type="text" placeholder="e.g. Lilongwe, Area 43"></div>
+      <div class="fs-row">
+        <div class="fg"><label class="fl" data-k="fPhone"></label><input class="fi" id="f-phone" type="tel" placeholder="08X XXXX XXX"></div>
+        <div class="fg"><label class="fl" data-k="fPay"></label>
+          <select class="fs" id="f-pay">
+            <option value="airtel">Airtel Money</option>
+            <option value="tnm">TNM Mpamba</option>
+            <option value="both" data-k="fPayBoth"></option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl" data-k="fOwner"></label><input class="fi" id="f-owner" type="text" placeholder="e.g. Chimwemwe M."></div>
+      <div class="fg"><label class="fl" data-k="fEmoji"></label>
+        <select class="fs" id="f-emoji">
+          <option value="🌿">🌿 Garden</option><option value="🔧">🔧 Tools</option>
+          <option value="🍳">🍳 Kitchen</option><option value="⚡">⚡ Electronics</option>
+          <option value="🚲">🚲 Transport</option><option value="🎉">🎉 Events</option>
+          <option value="📽️">📽️ Projector</option><option value="⛺">⛺ Tent</option>
+          <option value="🔊">🔊 Sound</option><option value="🌱">🌱 Other</option>
+        </select>
+      </div>
+      <button class="fsub" onclick="submitListing()" data-k="fSubmit"></button>
+    </div>
+  </div>
+</div>
+
+<div id="v-mine" class="view">
+  <div class="sec">
+    <h2 class="sec-h" data-k="myListings"></h2>
+    <div id="mine-list"></div>
+  </div>
+</div>
+
+<div id="v-detail" class="view">
+  <div class="sec">
+    <button class="back-btn" onclick="goBack()">← <span data-k="back"></span></button>
+    <div class="dcard">
+      <div class="d-ico" id="d-ico"></div>
+      <div class="d-body">
+        <div class="d-title" id="d-title"></div>
+        <div class="d-price" id="d-price"></div>
+        <div class="d-info">
+          <div class="d-info-i"><label data-k="dLoc"></label><p id="d-loc"></p></div>
+          <div class="d-info-i"><label data-k="dCat"></label><p id="d-cat"></p></div>
+          <div class="d-info-i"><label data-k="dOwner"></label><p id="d-owner"></p></div>
+          <div class="d-info-i"><label data-k="dAvail"></label><p style="color:var(--lg);font-weight:500">✓ <span data-k="dAvailVal"></span></p></div>
+        </div>
+        <p class="d-desc" id="d-desc"></p>
+        <div class="pay-box">
+          <div class="pay-box-t">💳 <span data-k="payTitle"></span></div>
+          <p id="d-pay-text"></p>
+        </div>
+        <div class="borrow-section" id="borrow-confirm">
+          <h4>📞 <span data-k="contactInfo"></span></h4>
+          <p data-k="contactDesc"></p>
+          <div class="phone" id="d-phone"></div>
+          <p style="margin-top:8px;" id="d-pay-method"></p>
+        </div>
+        <button class="borrow-btn" id="borrow-btn" onclick="showContact()"><span data-k="borrowBtn"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const EMOJIS = {garden:'🌿',tools:'🔧',kitchen:'🍳',electronics:'⚡',transport:'🚲',events:'🎉'};
+
+const TX = {
+  en:{
+    home:'Home',browse:'Browse',listAsset:'List Asset',myListings:'My Listings',
+    heroLine1:'Share What You Own.',heroLine2:'Borrow What You Need.',
+    heroSub:'A community lending platform for Malawi. Earn money from items you rarely use.',
+    heroBrowse:'Browse Assets',heroList:'List Your Asset',
+    statListings:'Active Listings',statCities:'Cities',statSave:'Save Per Day',statPay:'Mobile Money',
+    howItWorks:'How It Works',
+    s1t:'List your item',s1d:'Post your unused asset with a daily rental price in Kwacha.',
+    s2t:'Get requests',s2d:'Borrowers find your listing and contact you directly.',
+    s3t:'Get paid',s3d:'Receive payment via Airtel Money or TNM Mpamba instantly.',
+    featured:'Featured Listings',footerLine:'Connecting communities across Malawi.',
+    listTitle:'List Your Asset',
+    fName:'Asset Name',fDesc:'Description',fPrice:'Daily Price (MK)',fCat:'Category',
+    fLoc:'Your Location',fPhone:'Your Mobile Number',fPay:'Payment Method',
+    fPayBoth:'Both (Airtel & TNM)',fOwner:'Your Name',fEmoji:'Item Icon',fSubmit:'Submit Listing',
+    search:'Search assets...',back:'Back',
+    catGarden:'Garden & Outdoor',catTools:'Tools & Equipment',catKitchen:'Kitchen & Cooking',
+    catElec:'Electronics',catTransport:'Transport',catEvents:'Events & Party',
+    catAll:'All Categories',
+    perDay:'/ day',
+    dLoc:'Location',dCat:'Category',dOwner:'Owner',dAvail:'Availability',dAvailVal:'Available Now',
+    payTitle:'Payment via Mobile Money',
+    contactInfo:'Contact Details',contactDesc:'Call or send mobile money to:',
+    borrowBtn:'Request to Borrow',
+    successMsg:'✓ Your listing has been added! People can now find and borrow your item.',
+    noResults:'No assets found. Try searching something else.',
+    myEmpty:'You have not listed any assets yet.',myEmptySub:'List something you own and earn money!',
+    results:'results found',
+    airtelPay:'Pay via Airtel Money',tnmPay:'Pay via TNM Mpamba',bothPay:'Pay via Airtel Money or TNM Mpamba',
+  },
+  ny:{
+    home:'Nyumba',browse:'Sakaniza',listAsset:'Lemba Chinthu',myListings:'Zinthu Zanga',
+    heroLine1:'Gawana Zimene Uli Nazo.',heroLine2:'Tengera Zimene Ukufuna.',
+    heroSub:'Njira yolendana zinthu ku Malawi. Peza ndalama kuchokera ku zinthu zimene sumagwiritsa ntchito.',
+    heroBrowse:'Sakaniza Zinthu',heroList:'Lemba Chinthu Chako',
+    statListings:'Zinthu Zolembedwa',statCities:'Mizinda',statSave:'Osasavitsa Pa Tsiku',statPay:'Mobile Money',
+    howItWorks:'Mmene Zimakhalira',
+    s1t:'Lemba chinthu chako',s1d:'Yika chinthu chako chimene susagwiritse ntchito ndi mtengo wa tsiku.',
+    s2t:'Pokelera zopempha',s2d:'Omwe akufuna kutengera akukupeza ndikukulumikizani.',
+    s3t:'Landira ndalama',s3d:'Landira ndalama kudzera Airtel Money kapena TNM Mpamba msanga.',
+    featured:'Zinthu Zosankhidwa',footerLine:'Kulumikiza mabungwe ku Malawi konse.',
+    listTitle:'Lemba Chinthu Chako',
+    fName:'Dzina la Chinthu',fDesc:'Mfotokozero',fPrice:'Mtengo wa Tsiku (MK)',fCat:'Mtundu',
+    fLoc:'Malo Ako',fPhone:'Nambala Yako ya Foni',fPay:'Njira ya Malipiro',
+    fPayBoth:'Ziwiri (Airtel & TNM)',fOwner:'Dzina Lako',fEmoji:'Chithunzi cha Chinthu',fSubmit:'Tumiza',
+    search:'Sakha zinthu...',back:'Bwerera',
+    catGarden:'Munda & Kunja',catTools:'Zida & Zipangizo',catKitchen:'Komboni & Kuphika',
+    catElec:'Zida za Magetsi',catTransport:'Mayendedwe',catEvents:'Zikondwerero',
+    catAll:'Mitundu Yonse',
+    perDay:'/ tsiku',
+    dLoc:'Malo',dCat:'Mtundu',dOwner:'Mwini',dAvail:'Kukhalapo',dAvailVal:'Zilipo Tsopano',
+    payTitle:'Malipiro kudzera Mobile Money',
+    contactInfo:'Zambiri za Kulumikizana',contactDesc:'Imbani kapena tumizani ndalama kwa:',
+    borrowBtn:'Pempha Kutengera',
+    successMsg:'✓ Chinthu chako chalembedwa! Anthu atha kukupeza ndikutengera chinthu chako.',
+    noResults:'Palibe zinthu. Yesera kusakha kwina.',
+    myEmpty:'Simunalembe chinthu chilichonse.',myEmptySub:'Lemba chinthu ndikupeza ndalama!',
+    results:'zapezeka',
+    airtelPay:'Lipira ndi Airtel Money',tnmPay:'Lipira ndi TNM Mpamba',bothPay:'Lipira ndi Airtel Money kapena TNM Mpamba',
+  }
+};
+
+const SAMPLES = [
+  {id:1,name:'Lawn Mower',nameny:'Makina a Udzu',desc:'Electric lawn mower, perfect for medium gardens. Well maintained and reliable.',descny:'Makina ogema udzu, abwino kwa minda yazaka. Asungidwa bwino.',price:500,location:'Lilongwe, Area 49',category:'garden',phone:'0881 234 567',payMethod:'airtel',owner:'Chimwemwe M.',emoji:'🌿'},
+  {id:2,name:'Generator (2.5KVA)',nameny:'Jenereta (2.5KVA)',desc:'Reliable generator for home backup or outdoor events. Fuel not included.',descny:'Jenereta yotenthetsedwa bwino. Mafuta siaphatikizidwa.',price:2000,location:'Blantyre, Chilomoni',category:'electronics',phone:'0991 234 567',payMethod:'tnm',owner:'Takondwa B.',emoji:'⚡'},
+  {id:3,name:'4-Person Camping Tent',nameny:'Tenti ya Anthu 4',desc:'Waterproof tent, great for camping trips or outdoor events. Easy to set up.',descny:'Tenti yotetezera mvula. Yosavuta kuimika.',price:800,location:'Zomba',category:'events',phone:'0881 234 568',payMethod:'airtel',owner:'Mphatso K.',emoji:'⛺'},
+  {id:4,name:'Power Drill',nameny:'Diruwa la Magetsi',desc:'Bosch power drill with multiple drill bits. Perfect for home improvement projects.',descny:'Diruwa la Bosch ndi masomba ambiri. Yabwino pa ntchito zapakhomo.',price:300,location:'Lilongwe, Kawale',category:'tools',phone:'0991 234 568',payMethod:'tnm',owner:'Dalitso N.',emoji:'🔧'},
+  {id:5,name:'HD Projector',nameny:'Pojekita ya HD',desc:'1080p projector. Perfect for movie nights, presentations or church events. Includes HDMI cable.',descny:'Pojekita ya 1080p. Yabwino pa mafilimu ndi mapemphero.',price:1500,location:'Mzuzu',category:'electronics',phone:'0881 234 569',payMethod:'airtel',owner:'Kondwani P.',emoji:'📽️'},
+  {id:6,name:'Stand Mixer',nameny:'Makina a Kusakaniza',desc:'Heavy duty 5L stand mixer for baking cakes and bread. Bowl and attachments included.',descny:'Makina amphamvu a kusakaniza pokha. Mbale ya 5L ikuphatikizidwa.',price:600,location:'Blantyre, Limbe',category:'kitchen',phone:'0991 234 569',payMethod:'tnm',owner:'Chisomo W.',emoji:'🍰'},
+  {id:7,name:'Mountain Bicycle',nameny:'Njinga ya Mapiri',desc:'Adult mountain bike in excellent condition. Good for city and off-road use.',descny:'Njinga ya mapiri yomwe ili bwino. Yoyenera akuluakulu.',price:400,location:'Lilongwe, Biwi',category:'transport',phone:'0881 234 570',payMethod:'airtel',owner:'Yamikani C.',emoji:'🚲'},
+  {id:8,name:'PA Sound System',nameny:'Sistema ya Phokoso',desc:'Complete PA system: 2 x 15" speakers, amplifier, microphone and cables. Perfect for events.',descny:'Sistema yonse: akalonji 2, amupilifa ndi maikrofoni.',price:3000,location:'Blantyre, Ndirande',category:'events',phone:'0991 234 570',payMethod:'tnm',owner:'Agness M.',emoji:'🔊'},
+];
+
+let lang='en', listings=[...SAMPLES], myListings=[], currentView='home', prevView='home', selectedId=null, filterCat='all', searchQ='', contactShown=false;
+
+function t(k){return TX[lang][k]||TX.en[k]||k;}
+
+async function loadFromStorage(){
+  try{
+    const r=await window.storage.get('lendit-listings');
+    if(r&&r.value){const saved=JSON.parse(r.value);listings=[...SAMPLES,...saved];myListings=saved;}
+  }catch(e){}
+}
+
+async function saveToStorage(){
+  try{await window.storage.set('lendit-listings',JSON.stringify(myListings));}catch(e){}
+}
+
+function updateTexts(){
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    const k=el.getAttribute('data-k');
+    el.textContent=t(k);
+  });
+  document.querySelectorAll('[data-ph]').forEach(el=>{
+    el.placeholder=t(el.getAttribute('data-ph'));
+  });
+  document.getElementById('lang-btn').textContent='🌐 '+(lang==='en'?'EN':'NY');
+  renderChips();
+  renderHomeGrid();
+  renderBrowseGrid();
+  renderMine();
+  updateStatCount();
+  if(selectedId)renderDetail(selectedId);
+  const opts=document.querySelectorAll('#f-cat option[data-k],#f-pay option[data-k]');
+  opts.forEach(o=>o.textContent=t(o.getAttribute('data-k')));
+}
+
+function toggleLang(){lang=lang==='en'?'ny':'en';updateTexts();}
+
+function nav(view){
+  prevView=currentView;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.nlink').forEach(b=>b.classList.remove('on'));
+  document.getElementById('v-'+view).classList.add('on');
+  const nb=document.getElementById('n-'+view);
+  if(nb)nb.classList.add('on');
+  currentView=view;
+  contactShown=false;
+  if(view==='browse')renderBrowseGrid();
+  if(view==='mine')renderMine();
+  if(view==='home'){renderHomeGrid();updateStatCount();}
+  window.scrollTo?window.scrollTo(0,0):null;
+}
+
+function goBack(){nav(prevView==='detail'?'browse':prevView);}
+
+function updateStatCount(){
+  const el=document.getElementById('stat-count');
+  if(el)el.textContent=listings.length;
+}
+
+function getCatLabel(c){
+  const map={garden:'catGarden',tools:'catTools',kitchen:'catKitchen',electronics:'catElec',transport:'catTransport',events:'catEvents'};
+  return t(map[c]||'catGarden');
+}
+
+function getPayText(m){
+  if(m==='airtel')return t('airtelPay');
+  if(m==='tnm')return t('tnmPay');
+  return t('bothPay');
+}
+
+function cardHTML(item){
+  const name=lang==='ny'&&item.nameny?item.nameny:item.name;
+  const cat=getCatLabel(item.category);
+  return `<div class="card" onclick="openDetail(${item.id})">
+    <div class="card-ico">${item.emoji||EMOJIS[item.category]||'📦'}</div>
+    <div class="card-body">
+      <div class="card-name">${name}</div>
+      <div class="card-loc">📍 ${item.location}</div>
+      <div class="card-price">MK ${item.price.toLocaleString()}<span> ${t('perDay')}</span></div>
+      <span class="cat-tag">${cat}</span>
+      <span class="pay-tag">${item.payMethod==='tnm'?'TNM':'Airtel'}</span>
+    </div>
+  </div>`;
+}
+
+function renderHomeGrid(){
+  const g=document.getElementById('home-grid');
+  if(g)g.innerHTML=listings.slice(0,6).map(cardHTML).join('');
+}
+
+function applyFilters(){
+  searchQ=(document.getElementById('search-input')||{}).value||'';
+  renderBrowseGrid();
+}
+
+function setFilter(cat){
+  filterCat=cat;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat===cat));
+  renderBrowseGrid();
+}
+
+function renderChips(){
+  const cats=[['all','catAll'],['garden','catGarden'],['tools','catTools'],['kitchen','catKitchen'],['electronics','catElec'],['transport','catTransport'],['events','catEvents']];
+  const ch=document.getElementById('chips');
+  if(ch)ch.innerHTML=cats.map(([c,k])=>`<button class="chip${filterCat===c?' on':''}" data-cat="${c}" onclick="setFilter('${c}')">${t(k)}</button>`).join('');
+}
+
+function renderBrowseGrid(){
+  const q=searchQ.toLowerCase();
+  const filtered=listings.filter(item=>{
+    const name=(lang==='ny'&&item.nameny?item.nameny:item.name).toLowerCase();
+    const desc=(lang==='ny'&&item.descny?item.descny:item.desc).toLowerCase();
+    const matchSearch=!q||name.includes(q)||desc.includes(q)||item.location.toLowerCase().includes(q);
+    const matchCat=filterCat==='all'||item.category===filterCat;
+    return matchSearch&&matchCat;
+  });
+  const rc=document.getElementById('results-count');
+  if(rc)rc.textContent=`${filtered.length} ${t('results')}`;
+  const g=document.getElementById('browse-grid');
+  if(g)g.innerHTML=filtered.length?filtered.map(cardHTML).join(''):`<div class="no-res">${t('noResults')}</div>`;
+}
+
+function openDetail(id){
+  selectedId=id;
+  renderDetail(id);
+  prevView=currentView;
+  nav('detail');
+}
+
+function renderDetail(id){
+  const item=listings.find(l=>l.id===id);
+  if(!item)return;
+  const name=lang==='ny'&&item.nameny?item.nameny:item.name;
+  const desc=lang==='ny'&&item.descny?item.descny:item.desc;
+  document.getElementById('d-ico').textContent=item.emoji||EMOJIS[item.category]||'📦';
+  document.getElementById('d-title').textContent=name;
+  document.getElementById('d-price').innerHTML=`MK ${item.price.toLocaleString()} <span style="font-size:14px;font-family:system-ui;font-weight:400;color:var(--color-text-secondary)">${t('perDay')}</span>`;
+  document.getElementById('d-loc').textContent=item.location;
+  document.getElementById('d-cat').textContent=getCatLabel(item.category);
+  document.getElementById('d-owner').textContent=item.owner||'Anonymous';
+  document.getElementById('d-desc').textContent=desc;
+  document.getElementById('d-pay-text').textContent=getPayText(item.payMethod);
+  document.getElementById('d-phone').textContent=item.phone||'Contact via app';
+  document.getElementById('d-pay-method').textContent=getPayText(item.payMethod);
+  const bc=document.getElementById('borrow-confirm');
+  if(bc)bc.classList.remove('on');
+  const bb=document.getElementById('borrow-btn');
+  if(bb)bb.textContent=t('borrowBtn');
+  contactShown=false;
+}
+
+function showContact(){
+  const bc=document.getElementById('borrow-confirm');
+  const bb=document.getElementById('borrow-btn');
+  if(!contactShown){
+    if(bc)bc.classList.add('on');
+    if(bb)bb.style.display='none';
+    contactShown=true;
+  }
+}
+
+function submitListing(){
+  const name=document.getElementById('f-name').value.trim();
+  const desc=document.getElementById('f-desc').value.trim();
+  const price=parseInt(document.getElementById('f-price').value)||0;
+  const cat=document.getElementById('f-cat').value;
+  const loc=document.getElementById('f-loc').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const pay=document.getElementById('f-pay').value;
+  const owner=document.getElementById('f-owner').value.trim();
+  const emoji=document.getElementById('f-emoji').value;
+  if(!name||!price||!loc||!phone){alert(lang==='en'?'Please fill all required fields.':'Chonde dzazani mafunda onse.');return;}
+  const newItem={id:Date.now(),name,desc:desc||name,price,location:loc,category:cat,phone,payMethod:pay==='both'?'airtel':pay,owner:owner||'Anonymous',emoji,isOwn:true};
+  myListings.push(newItem);
+  listings.push(newItem);
+  saveToStorage();
+  ['f-name','f-desc','f-price','f-loc','f-phone','f-owner'].forEach(id=>{document.getElementById(id).value='';});
+  const sm=document.getElementById('success-msg');
+  if(sm){sm.textContent=t('successMsg');sm.classList.add('on');setTimeout(()=>sm.classList.remove('on'),5000);}
+  updateStatCount();
+}
+
+function renderMine(){
+  const ml=document.getElementById('mine-list');
+  if(!ml)return;
+  if(!myListings.length){
+    ml.innerHTML=`<div class="empty"><div class="empty-ico">📦</div><p style="font-weight:500">${t('myEmpty')}</p><p style="font-size:13px;color:var(--color-text-secondary);margin-top:6px">${t('myEmptySub')}</p><button class="btn-p" style="margin-top:1rem" onclick="nav('list')">${t('listAsset')}</button></div>`;
+    return;
+  }
+  ml.innerHTML=myListings.map(item=>`
+    <div class="my-card">
+      <div class="my-card-ico">${item.emoji||EMOJIS[item.category]||'📦'}</div>
+      <div class="my-card-info">
+        <div class="my-card-name">${item.name}</div>
+        <div class="my-card-price">MK ${item.price.toLocaleString()} ${t('perDay')}</div>
+        <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px">📍 ${item.location}</div>
+      </div>
+      <span class="my-card-badge">✓ ${t('dAvailVal')}</span>
+    </div>
+  `).join('');
+}
+
+async function init(){
+  await loadFromStorage();
+  updateTexts();
+  renderHomeGrid();
+  renderBrowseGrid();
+  updateStatCount();
+}
+
+init();
+</script>
