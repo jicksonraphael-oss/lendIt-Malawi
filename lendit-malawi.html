@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LendIt Malawi – Borrow & Lend in Malawi</title>
+<meta name="description" content="Malawi's peer-to-peer asset lending platform. Borrow tools, generators, tents and more from your community.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#1e5c30;--g2:#154022;--g3:#0e3d23;
+  --a:#c8861e;--al:#f8edd6;--ad:#8b5e0f;
+  --b:#1a6b8a;--bl:#ddf0f7;
+  --r:#b83232;--rl:#fdeaea;
+  --bg:#f4f5f0;--surf:#ffffff;--surf2:#f8f8f6;
+  --bord:rgba(0,0,0,0.1);--bord2:rgba(0,0,0,0.18);
+  --txt:#1a1a18;--txt2:#5a5a55;--txt3:#8a8a85;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1a18;--surf:#242422;--surf2:#2e2e2b;
+    --bord:rgba(255,255,255,0.1);--bord2:rgba(255,255,255,0.18);
+    --txt:#f0f0ec;--txt2:#a8a8a2;--txt3:#686865;
+    --al:#3a2c10;--ad:#e8a840;--bl:#0d2d3a;
+    --rl:#2d1010;
+  }
+}
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;}
+button{cursor:pointer;font-family:inherit;}
+input,select,textarea{font-family:inherit;color:var(--txt);}
+a{color:var(--b);text-decoration:none;}
+
+/* NAV */
+.nav{background:var(--g);padding:0 1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--a);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:4px;}
+.brand{font-family:Georgia,serif;font-size:18px;color:#fff;padding:11px 0;white-space:nowrap;cursor:pointer;}
+.brand em{color:var(--a);font-style:normal;}
+.nav-right{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:4px 0;}
+.nlink{color:rgba(255,255,255,0.72);background:none;border:none;padding:7px 10px;font-size:12px;border-radius:6px;transition:all 0.15s;white-space:nowrap;}
+.nlink:hover{color:#fff;background:rgba(255,255,255,0.15);}
+.nlink.on{color:var(--a);font-weight:600;}
+.lang-btn{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.28);padding:5px 10px;border-radius:20px;font-size:11px;}
+.notif-btn{position:relative;background:none;border:none;color:rgba(255,255,255,0.8);font-size:16px;padding:6px;border-radius:6px;line-height:1;}
+.notif-btn:hover{background:rgba(255,255,255,0.15);}
+.notif-badge{position:absolute;top:2px;right:2px;background:var(--r);color:#fff;font-size:9px;font-weight:700;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+
+/* NOTIFICATIONS PANEL */
+.notif-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;display:none;}
+.notif-overlay.on{display:block;}
+.notif-panel{position:fixed;top:0;right:0;width:320px;max-width:100vw;height:100vh;background:var(--surf);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.25s ease;box-shadow:-4px 0 20px rgba(0,0,0,0.15);}
+.notif-panel.on{transform:translateX(0);}
+.notif-hdr{background:var(--g);color:#fff;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--a);}
+.notif-hdr h3{font-family:Georgia,serif;font-size:16px;}
+.notif-close{background:none;border:none;color:rgba(255,255,255,0.8);font-size:18px;cursor:pointer;}
+.notif-list{flex:1;overflow-y:auto;padding:0.75rem;}
+.notif-item{background:var(--surf2);border:0.5px solid var(--bord);border-left:3px solid var(--a);border-radius:8px;padding:0.85rem;margin-bottom:0.6rem;}
+.notif-item.unread{border-left-color:var(--g);}
+.notif-item-t{font-weight:600;font-size:13px;margin-bottom:3px;}
+.notif-item-d{font-size:12px;color:var(--txt2);line-height:1.5;}
+.notif-item-time{font-size:10px;color:var(--txt3);margin-top:4px;}
+.notif-empty{text-align:center;padding:3rem 1rem;color:var(--txt3);}
+.mark-read-btn{width:100%;background:none;border:1px solid var(--bord2);border-radius:8px;padding:8px;font-size:12px;color:var(--txt2);margin-top:0.5rem;}
+.mark-read-btn:hover{background:var(--surf2);}
+
+/* VIEWS */
+.view{display:none;}.view.on{display:block;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--g3) 0%,var(--g) 55%,var(--g2) 100%);padding:3rem 1.5rem;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border-radius:50%;background:rgba(200,134,30,0.1);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(200,134,30,0.22);color:var(--a);border:1px solid rgba(200,134,30,0.38);padding:4px 16px;border-radius:20px;font-size:11px;margin-bottom:1rem;letter-spacing:1.2px;text-transform:uppercase;}
+.hero-h{font-family:Georgia,serif;font-size:2.1rem;color:#fff;line-height:1.2;margin-bottom:0.75rem;}
+.hero-h em{color:var(--a);font-style:normal;}
+.hero-sub{color:rgba(255,255,255,0.72);font-size:1rem;margin-bottom:1.75rem;line-height:1.65;max-width:500px;margin-left:auto;margin-right:auto;}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn-p{background:var(--a);color:#fff;border:none;padding:12px 26px;border-radius:26px;font-size:14px;font-weight:600;transition:all 0.15s;}
+.btn-p:hover{background:var(--ad);transform:translateY(-1px);}
+.btn-s{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.42);padding:12px 26px;border-radius:26px;font-size:14px;font-weight:500;transition:all 0.15s;}
+.btn-s:hover{border-color:#fff;background:rgba(255,255,255,0.1);}
+
+/* LOC BAR */
+.loc-bar{background:var(--surf);border-bottom:0.5px solid var(--bord);padding:0.55rem 1rem;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--txt2);}
+.loc-dot{width:8px;height:8px;border-radius:50%;background:#aaa;flex-shrink:0;}
+.loc-dot.on{background:#2a9d5c;}
+.loc-btn{background:none;border:1px solid var(--bord2);border-radius:12px;padding:3px 10px;font-size:11px;color:var(--b);margin-left:auto;}
+
+/* STATS */
+.stats{display:flex;justify-content:center;gap:2rem;background:var(--surf);padding:0.9rem 1rem;border-bottom:0.5px solid var(--bord);flex-wrap:wrap;}
+.snum{font-family:Georgia,serif;font-size:1.45rem;color:var(--a);text-align:center;}
+.slbl{font-size:11px;color:var(--txt2);text-align:center;}
+
+/* SECTIONS */
+.sec{max-width:980px;margin:0 auto;padding:1.75rem 1rem;}
+.sec-h{font-family:Georgia,serif;font-size:1.3rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;color:var(--txt);}
+.sec-h::after{content:'';flex:1;height:1px;background:var(--bord);}
+
+/* HOW IT WORKS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.9rem;}
+.step{background:var(--surf);border:0.5px solid var(--bord);border-top:3px solid var(--a);border-radius:12px;padding:1.25rem;text-align:center;}
+.step-n{width:30px;height:30px;border-radius:50%;background:var(--al);color:var(--ad);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.65rem;}
+.step-t{font-weight:600;font-size:13px;margin-bottom:5px;color:var(--txt);}
+.step-d{font-size:12px;color:var(--txt2);line-height:1.55;}
+
+/* CARDS GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.9rem;}
+.card{background:var(--surf);border:0.5px solid var(--bord);border-left:3px solid var(--a);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.18s;}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.1);border-color:var(--a);}
+.card-ico{background:var(--al);padding:1.1rem;text-align:center;font-size:2.3rem;}
+.card-body{padding:0.85rem;}
+.card-name{font-weight:600;font-size:13px;margin-bottom:3px;color:var(--txt);}
+.card-loc{font-size:11px;color:var(--txt2);margin-bottom:4px;}
+.card-dist{font-size:11px;color:var(--b);margin-bottom:4px;}
+.card-price{font-family:Georgia,serif;font-size:16px;color:var(--ad);font-weight:700;}
+.card-price span{font-size:11px;color:var(--txt3);font-family:system-ui;font-weight:400;}
+.cat-tag{display:inline-block;background:#e4f0e8;color:var(--g);font-size:10px;padding:2px 8px;border-radius:10px;margin-top:5px;}
+.stars-sm{color:var(--a);font-size:11px;margin-top:3px;}
+
+/* BROWSE */
+.sb{display:flex;gap:8px;margin-bottom:0.9rem;}
+.si{flex:1;padding:9px 13px;border:1px solid var(--bord2);border-radius:8px;font-size:13px;background:var(--surf);}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.2rem;}
+.chip{padding:5px 13px;border-radius:20px;font-size:11px;border:1px solid var(--bord);background:var(--surf);color:var(--txt2);cursor:pointer;transition:all 0.15s;}
+.chip.on{background:var(--a);color:#fff;border-color:var(--a);}
+
+/* DETAIL */
+.back-btn{background:none;border:none;color:var(--g);font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:1rem;padding:0;font-weight:600;}
+.dcard{background:var(--surf);border:0.5px solid var(--bord);border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.d-ico{background:var(--al);padding:2.5rem;text-align:center;font-size:5rem;}
+.d-body{padding:1.5rem;}
+.d-title{font-family:Georgia,serif;font-size:1.5rem;margin-bottom:0.4rem;color:var(--txt);}
+.d-price{font-family:Georgia,serif;font-size:1.75rem;color:var(--ad);font-weight:700;margin-bottom:1rem;}
+.d-info{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;margin-bottom:1.25rem;}
+.d-info label{display:block;font-size:10px;color:var(--txt3);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.6px;}
+.d-info p{font-weight:600;font-size:13px;color:var(--txt);}
+.d-desc{color:var(--txt2);line-height:1.8;font-size:13px;margin-bottom:1.25rem;}
+.info-box{border-radius:8px;padding:0.9rem;margin-bottom:0.9rem;font-size:12px;}
+.info-box.blue{background:var(--bl);border:1px solid rgba(26,107,138,0.2);color:var(--b);}
+.info-box.amber{background:var(--al);border:1px solid rgba(200,134,30,0.25);color:var(--ad);}
+.info-box.green{background:#e4f0e8;border:1px solid rgba(30,92,48,0.2);color:var(--g2);}
+.info-box-t{font-weight:700;font-size:13px;margin-bottom:6px;}
+
+/* CALENDAR */
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.cal-nav-btn{background:none;border:1px solid var(--bord2);border-radius:6px;padding:4px 11px;font-size:13px;cursor:pointer;color:var(--txt);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-lbl{text-align:center;font-size:10px;color:var(--txt3);padding:3px 0;font-weight:600;}
+.cal-d{text-align:center;padding:6px 2px;font-size:12px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:all 0.1s;color:var(--txt);}
+.cal-d.empty{cursor:default;}
+.cal-d.avail{background:#e4f0e8;color:var(--g);border-color:rgba(30,92,48,0.15);}
+.cal-d.avail:hover{background:#c8e0ce;}
+.cal-d.unavail{background:var(--rl);color:#bbb;text-decoration:line-through;cursor:not-allowed;}
+.cal-d.sel{background:var(--a);color:#fff;border-color:var(--a);}
+.cal-d.today{font-weight:700;}
+.cal-legend{display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--txt2);}
+.cal-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+/* FEE BOX */
+.fee-box{background:var(--surf2);border:0.5px solid var(--bord);border-radius:8px;padding:1rem;margin-bottom:1rem;}
+.fee-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:var(--txt);}
+.fee-row.total{border-top:1px solid var(--bord);margin-top:6px;padding-top:10px;font-weight:700;font-size:14px;}
+
+/* PAY OPTIONS */
+.pay-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;}
+.pay-opt{border:2px solid var(--bord);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--surf);}
+.pay-opt:hover{border-color:var(--a);}
+.pay-opt.on{border-color:var(--a);background:var(--al);}
+.pay-opt-ico{font-size:1.6rem;margin-bottom:4px;}
+.pay-opt-lbl{font-size:12px;font-weight:600;color:var(--txt);}
+
+/* CONFIRM */
+.confirm-box{background:#e4f0e8;border:1px solid rgba(30,92,48,0.3);border-radius:10px;padding:1.25rem;display:none;}
+.confirm-box.on{display:block;}
+.confirm-box h4{color:var(--g);margin-bottom:8px;font-size:14px;font-weight:700;}
+.phone-big{font-size:1.4rem;font-weight:700;color:var(--ad);font-family:Georgia,serif;margin:6px 0;}
+.wa-btn{display:inline-flex;align-items:center;gap:7px;background:#25d366;color:#fff;border:none;padding:10px 22px;border-radius:25px;font-size:13px;font-weight:600;margin-top:10px;}
+
+/* BUTTONS */
+.btn{width:100%;padding:13px;border-radius:26px;font-size:14px;font-weight:600;border:none;transition:all 0.15s;margin-top:4px;}
+.btn.green{background:var(--g);color:#fff;}.btn.green:hover{background:var(--g2);}
+.btn.amber{background:var(--a);color:#fff;}.btn.amber:hover{background:var(--ad);}
+.btn.red-outline{background:transparent;color:var(--r);border:2px solid var(--r);}.btn.red-outline:hover{background:var(--rl);}
+.btn.secondary{background:var(--surf2);color:var(--txt);border:0.5px solid var(--bord2);}
+.btn:disabled{background:#ccc;color:#888;cursor:not-allowed;}
+.btn-sm{padding:8px 18px;font-size:12px;border-radius:20px;font-weight:600;border:none;width:auto;display:inline-block;}
+
+/* REVIEWS */
+.review-card{background:var(--surf2);border-radius:8px;padding:0.9rem;margin-bottom:0.6rem;}
+.review-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--al);color:var(--ad);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+.star-pick{display:flex;gap:4px;margin-bottom:0.5rem;}
+.star-pick button{background:none;border:none;font-size:1.4rem;cursor:pointer;padding:2px;}
+
+/* FORMS */
+.fcard{background:var(--surf);border:0.5px solid var(--bord);border-radius:14px;padding:1.75rem;max-width:560px;margin:0 auto;box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.f-title{font-family:Georgia,serif;font-size:1.3rem;margin-bottom:1.25rem;color:var(--txt);}
+.fg{margin-bottom:1rem;}
+.fl{display:block;font-size:10px;font-weight:700;color:var(--txt3);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.fi,.fs,.fta{width:100%;padding:10px 13px;border:1px solid var(--bord2);border-radius:8px;font-size:13px;background:var(--surf);}
+.fi:focus,.fs:focus,.fta:focus{outline:none;border-color:var(--a);}
+.fta{min-height:82px;resize:vertical;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:0.9rem;}
+.fee-notice{background:#e4f0e8;border:1px solid rgba(30,92,48,0.2);border-radius:8px;padding:0.9rem;margin-bottom:1rem;font-size:12px;color:var(--g2);}
+
+/* ALERTS */
+.success-bar{background:#e4f0e8;border:1px solid rgba(30,92,48,0.3);border-radius:8px;padding:0.85rem 1.1rem;color:var(--g);font-weight:600;font-size:13px;margin-bottom:1rem;}
+.err-bar{background:var(--rl);border:1px solid rgba(184,50,50,0.3);border-radius:8px;padding:0.85rem 1.1rem;color:var(--r);font-size:13px;margin-bottom:1rem;}
+
+/* PROFILE */
+.profile-header{background:linear-gradient(135deg,var(--g2),var(--g));padding:2rem 1.5rem;border-radius:12px;margin-bottom:1.25rem;display:flex;align-items:center;gap:1.25rem;}
+.profile-avatar{width:68px;height:68px;border-radius:50%;background:var(--al);color:var(--ad);display:flex;align-items:center;justify-content:center;font-size:1.7rem;font-weight:700;flex-shrink:0;border:3px solid rgba(200,134,30,0.5);}
+.profile-name{font-family:Georgia,serif;font-size:1.35rem;color:#fff;margin-bottom:3px;}
+.profile-sub{font-size:12px;color:rgba(255,255,255,0.65);}
+.earn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.25rem;}
+.earn-card{background:var(--surf);border:0.5px solid var(--bord);border-radius:10px;padding:0.9rem;text-align:center;}
+.earn-num{font-family:Georgia,serif;font-size:1.3rem;color:var(--ad);font-weight:700;}
+.earn-lbl{font-size:10px;color:var(--txt2);margin-top:2px;}
+.my-card{background:var(--surf);border:0.5px solid var(--bord);border-left:3px solid var(--g);border-radius:12px;padding:0.9rem;display:flex;align-items:center;gap:0.9rem;margin-bottom:0.65rem;cursor:pointer;transition:all 0.15s;}
+.my-card:hover{transform:translateY(-1px);}
+.my-card-ico{font-size:1.8rem;background:#e4f0e8;padding:0.6rem;border-radius:8px;}
+.my-card-info{flex:1;}
+.badge-v{display:inline-flex;align-items:center;gap:4px;background:#e4f0e8;color:var(--g);font-size:10px;padding:3px 9px;border-radius:10px;font-weight:600;margin-top:6px;}
+.badge-active{background:#e4f0e8;color:var(--g);font-size:10px;padding:3px 9px;border-radius:10px;font-weight:600;white-space:nowrap;}
+
+/* AUTH */
+.auth-tabs{display:flex;background:var(--surf2);border-radius:10px;padding:4px;margin-bottom:1.25rem;gap:4px;}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:600;background:transparent;color:var(--txt2);transition:all 0.15s;}
+.auth-tab.on{background:var(--surf);color:var(--txt);box-shadow:0 1px 5px rgba(0,0,0,0.1);}
+.divider{display:flex;align-items:center;gap:8px;margin:1rem 0;color:var(--txt3);font-size:12px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bord);}
+.auth-gate{background:var(--al);border:1px solid rgba(200,134,30,0.25);border-radius:8px;padding:0.9rem;margin-bottom:0.85rem;}
+
+/* ADMIN */
+.admin-wrap{max-width:980px;margin:0 auto;padding:1.5rem 1rem;}
+.admin-hdr{background:var(--g2);color:#fff;border-radius:12px;padding:1.5rem;margin-bottom:1.25rem;border:2px solid var(--a);}
+.admin-hdr h2{font-family:Georgia,serif;font-size:1.4rem;color:#fff;margin-bottom:4px;}
+.admin-hdr p{font-size:12px;color:rgba(255,255,255,0.65);}
+.admin-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.75rem;margin-bottom:1.25rem;}
+.kpi-card{background:var(--surf);border:0.5px solid var(--bord);border-radius:10px;padding:1rem;text-align:center;}
+.kpi-num{font-family:Georgia,serif;font-size:1.6rem;color:var(--a);font-weight:700;}
+.kpi-lbl{font-size:11px;color:var(--txt2);margin-top:3px;}
+.admin-table{width:100%;border-collapse:collapse;background:var(--surf);border-radius:10px;overflow:hidden;border:0.5px solid var(--bord);}
+.admin-table th{background:var(--g);color:#fff;font-size:11px;font-weight:700;padding:10px 12px;text-align:left;text-transform:uppercase;letter-spacing:0.5px;}
+.admin-table td{padding:10px 12px;font-size:12px;border-bottom:0.5px solid var(--bord);color:var(--txt);}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:var(--surf2);}
+.tab-nav{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
+.tab-btn{padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--bord2);background:var(--surf);color:var(--txt2);transition:all 0.15s;}
+.tab-btn.on{background:var(--g);color:#fff;border-color:var(--g);}
+.withdraw-box{background:var(--al);border:1px solid rgba(200,134,30,0.3);border-radius:10px;padding:1.25rem;margin-bottom:1.25rem;}
+.withdraw-box h4{color:var(--ad);font-size:14px;margin-bottom:6px;}
+.withdraw-amount{font-family:Georgia,serif;font-size:2rem;color:var(--ad);font-weight:700;}
+.progress-bar{background:var(--bord);border-radius:4px;height:6px;margin-top:4px;}
+.progress-fill{background:var(--a);border-radius:4px;height:6px;transition:width 0.5s ease;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
+.status-dot.green{background:#2a9d5c;}.status-dot.amber{background:var(--a);}
+
+/* EMPTY */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--txt2);}
+.empty-ico{font-size:2.5rem;margin-bottom:0.75rem;}
+
+/* FOOTER */
+footer{background:var(--g);color:rgba(255,255,255,0.55);text-align:center;font-size:11px;padding:1.5rem;margin-top:2rem;}
+footer strong{color:var(--a);}
+.footer-note{background:rgba(255,255,255,0.08);border-radius:8px;padding:0.75rem 1rem;margin-top:0.75rem;font-size:11px;line-height:1.7;}
+
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESPONSIVE */
+@media(max-width:480px){
+  .hero-h{font-size:1.5rem;}
+  .frow{grid-template-columns:1fr;}
+  .earn-grid{grid-template-columns:1fr 1fr;}
+  .d-info{grid-template-columns:1fr;}
+  .pay-btns{grid-template-columns:1fr;}
+  .admin-kpi{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-overlay" id="notif-overlay" onclick="closeNotif()"></div>
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-hdr">
+    <h3>🔔 Notifications</h3>
+    <button class="notif-close" onclick="closeNotif()">✕</button>
+  </div>
+  <div style="padding:0.75rem;">
+    <button class="mark-read-btn" onclick="markAllRead()">Mark all as read</button>
+  </div>
+  <div class="notif-list" id="notif-list"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="brand" onclick="nav('home')">Lend<em>It</em> Malawi</div>
+  <div class="nav-right">
+    <button class="nlink on" onclick="nav('home')" id="n-home">🏠 <span data-k="home"></span></button>
+    <button class="nlink" onclick="nav('browse')" id="n-browse">🔍 <span data-k="browse"></span></button>
+    <button class="nlink" onclick="guardNav('list')" id="n-list">➕ <span data-k="listNav"></span></button>
+    <button class="nlink" onclick="nav('account')" id="n-account">👤 <span id="nav-user-lbl" data-k="account"></span></button>
+    <button class="notif-btn" onclick="openNotif()" id="notif-btn" title="Notifications">🔔<span class="notif-badge" id="notif-badge" style="display:none">0</span></button>
+    <button class="lang-btn" onclick="toggleLang()" id="lang-btn">🌐 EN</button>
+  </div>
+</nav>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div id="v-home" class="view on">
+  <div class="hero">
+    <div class="hero-tag">🇲🇼 Made for Malawi</div>
+    <h1 class="hero-h"><span data-k="h1"></span><br><em><span data-k="h2"></span></em></h1>
+    <p class="hero-sub" data-k="hsub"></p>
+    <div class="hero-btns">
+      <button class="btn-p" onclick="nav('browse')" data-k="hbrowse"></button>
+      <button class="btn-s" onclick="guardNav('list')" data-k="hlist"></button>
+    </div>
+  </div>
+  <div class="loc-bar">
+    <div class="loc-dot" id="loc-dot"></div>
+    <span id="loc-text" data-k="locOff"></span>
+    <button class="loc-btn" onclick="requestLoc()" id="loc-btn" data-k="enableLoc"></button>
+  </div>
+  <div class="stats">
+    <div><div class="snum" id="stat-n">8</div><div class="slbl" data-k="sListings"></div></div>
+    <div><div class="snum" id="stat-users">1</div><div class="slbl" data-k="sUsers"></div></div>
+    <div><div class="snum">10%</div><div class="slbl" data-k="sFee"></div></div>
+    <div><div class="snum">📱</div><div class="slbl" data-k="sPay"></div></div>
+  </div>
+  <div class="sec">
+    <h2 class="sec-h" data-k="hiw"></h2>
+    <div class="steps">
+      <div class="step"><div class="step-n">1</div><div class="step-t" data-k="s1t"></div><div class="step-d" data-k="s1d"></div></div>
+      <div class="step"><div class="step-n">2</div><div class="step-t" data-k="s2t"></div><div class="step-d" data-k="s2d"></div></div>
+      <div class="step"><div class="step-n">3</div><div class="step-t" data-k="s3t"></div><div class="step-d" data-k="s3d"></div></div>
+      <div class="step"><div class="step-n">4</div><div class="step-t" data-k="s4t"></div><div class="step-d" data-k="s4d"></div></div>
+    </div>
+  </div>
+  <div class="sec" style="padding-top:0">
+    <h2 class="sec-h" data-k="featured"></h2>
+    <div class="grid" id="home-grid"></div>
+    <div style="text-align:center;margin-top:1.25rem">
+      <button class="btn amber btn-sm" onclick="nav('browse')" data-k="viewAll"></button>
+    </div>
+  </div>
+  <footer>
+    <strong>LendIt Malawi</strong> &mdash; <span data-k="footLine"></span>
+    <div class="footer-note">🔐 <span data-k="footSec"></span></div>
+    <div style="margin-top:0.75rem;font-size:10px">
+      <button style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer" onclick="showAdminLogin()">Admin</button>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════ BROWSE ═══════════════ -->
+<div id="v-browse" class="view">
+  <div class="sec">
+    <div class="sb">
+      <input class="si" id="s-inp" oninput="applyF()" placeholder="Search assets...">
+    </div>
+    <div class="chips" id="chips"></div>
+    <div id="res-count" style="font-size:12px;color:var(--txt2);margin-bottom:0.85rem;"></div>
+    <div class="grid" id="browse-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ LIST ASSET ═══════════════ -->
+<div id="v-list" class="view">
+  <div class="sec">
+    <div id="s-bar" style="display:none" class="success-bar"></div>
+    <div class="fcard">
+      <h2 class="f-title" data-k="listTitle"></h2>
+      <div class="fee-notice">💰 <strong data-k="feeNoticeT"></strong> &mdash; <span data-k="feeNoticeD"></span></div>
+      <div class="fg"><label class="fl" data-k="fName"></label><input class="fi" id="f-name" type="text" placeholder="e.g. Lawn Mower, Generator..."></div>
+      <div class="fg"><label class="fl" data-k="fDesc"></label><textarea class="fta" id="f-desc" placeholder="Describe your item..."></textarea></div>
+      <div class="frow">
+        <div class="fg"><label class="fl" data-k="fPrice"></label><input class="fi" id="f-price" type="number" min="100" placeholder="MK"></div>
+        <div class="fg"><label class="fl" data-k="fDeposit"></label><input class="fi" id="f-dep" type="number" min="0" placeholder="MK"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl" data-k="fCat"></label>
+          <select class="fs" id="f-cat">
+            <option value="garden" data-k="cGarden"></option>
+            <option value="tools" data-k="cTools"></option>
+            <option value="kitchen" data-k="cKitchen"></option>
+            <option value="electronics" data-k="cElec"></option>
+            <option value="transport" data-k="cTransport"></option>
+            <option value="events" data-k="cEvents"></option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl" data-k="fPay"></label>
+          <select class="fs" id="f-pay">
+            <option value="airtel">Airtel Money</option>
+            <option value="tnm">TNM Mpamba</option>
+            <option value="both" data-k="fBoth"></option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl" data-k="fLoc"></label>
+        <div style="display:flex;gap:6px">
+          <input class="fi" id="f-loc" type="text" style="flex:1" placeholder="e.g. Lilongwe, Area 43">
+          <button style="background:var(--g);color:#fff;border:none;border-radius:8px;padding:0 13px;font-size:11px;white-space:nowrap;cursor:pointer;font-weight:600" onclick="fillLoc()">📍 GPS</button>
+        </div>
+      </div>
+      <div class="fg"><label class="fl" data-k="fIcon"></label>
+        <select class="fs" id="f-emoji">
+          <option value="🌿">🌿 Garden</option><option value="🔧">🔧 Tools</option>
+          <option value="🍳">🍳 Kitchen</option><option value="⚡">⚡ Electronics</option>
+          <option value="🚲">🚲 Transport</option><option value="🎉">🎉 Events</option>
+          <option value="📽️">📽️ Projector</option><option value="⛺">⛺ Tent</option>
+          <option value="🔊">🔊 Sound</option><option value="🌱">🌱 Other</option>
+        </select>
+      </div>
+      <button class="btn amber" onclick="submitListing()" id="list-btn" data-k="fSubmit"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ACCOUNT ═══════════════ -->
+<div id="v-account" class="view">
+  <!-- LOGGED IN -->
+  <div id="acct-in" style="display:none">
+    <div class="sec">
+      <div class="profile-header">
+        <div class="profile-avatar" id="p-avatar"></div>
+        <div>
+          <div class="profile-name" id="p-name"></div>
+          <div class="profile-sub" id="p-phone"></div>
+          <div class="profile-sub" id="p-loc"></div>
+          <span class="badge-v" style="margin-top:8px">✓ <span data-k="verified"></span></span>
+        </div>
+      </div>
+      <div class="earn-grid">
+        <div class="earn-card"><div class="earn-num" id="p-assets">0</div><div class="earn-lbl" data-k="myAssets"></div></div>
+        <div class="earn-card"><div class="earn-num" id="p-bookings">0</div><div class="earn-lbl" data-k="myBookings"></div></div>
+        <div class="earn-card"><div class="earn-num" id="p-earned">MK 0</div><div class="earn-lbl" data-k="earned"></div></div>
+      </div>
+      <h2 class="sec-h" data-k="myListings"></h2>
+      <div id="mine-list"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1.25rem">
+        <button class="btn amber btn-sm" onclick="guardNav('list')" data-k="addAsset"></button>
+        <button class="btn red-outline btn-sm" onclick="logout()" data-k="logout"></button>
+      </div>
+    </div>
+  </div>
+  <!-- LOGGED OUT -->
+  <div id="acct-out">
+    <div style="max-width:420px;margin:1.5rem auto;padding:0 1rem">
+      <div id="auth-msg" class="info-box amber" style="display:none;margin-bottom:1rem"></div>
+      <div class="auth-tabs">
+        <button class="auth-tab on" id="tab-login" onclick="switchTab('login')" data-k="login"></button>
+        <button class="auth-tab" id="tab-reg" onclick="switchTab('register')" data-k="register"></button>
+      </div>
+      <div id="auth-login">
+        <div class="fcard">
+          <h2 class="f-title" data-k="welcomeBack"></h2>
+          <div id="login-err" class="err-bar" style="display:none"></div>
+          <div class="fg"><label class="fl" data-k="phone"></label><input class="fi" id="l-phone" type="tel" placeholder="08X XXXX XXX"></div>
+          <div class="fg"><label class="fl" data-k="password"></label><input class="fi" id="l-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+          <button class="btn green" onclick="doLogin()" id="login-btn" data-k="loginBtn"></button>
+          <div class="divider" data-k="orDiv"></div>
+          <button class="btn secondary" onclick="switchTab('register')" data-k="noAccount"></button>
+        </div>
+      </div>
+      <div id="auth-reg" style="display:none">
+        <div class="fcard">
+          <h2 class="f-title" data-k="createAccount"></h2>
+          <div id="reg-err" class="err-bar" style="display:none"></div>
+          <div class="frow">
+            <div class="fg"><label class="fl" data-k="firstName"></label><input class="fi" id="r-first" type="text"></div>
+            <div class="fg"><label class="fl" data-k="lastName"></label><input class="fi" id="r-last" type="text"></div>
+          </div>
+          <div class="fg"><label class="fl" data-k="phone"></label><input class="fi" id="r-phone" type="tel" placeholder="08X XXXX XXX"></div>
+          <div class="fg"><label class="fl" data-k="yourLoc"></label><input class="fi" id="r-loc" type="text" placeholder="e.g. Lilongwe, Area 9"></div>
+          <div class="fg"><label class="fl" data-k="password"></label><input class="fi" id="r-pw" type="password" placeholder="Min 6 characters"></div>
+          <div class="fg"><label class="fl" data-k="confirmPw"></label><input class="fi" id="r-pw2" type="password" onkeydown="if(event.key==='Enter')doRegister()"></div>
+          <div style="font-size:11px;color:var(--txt2);margin-bottom:0.9rem;line-height:1.6" data-k="termsNote"></div>
+          <button class="btn amber" onclick="doRegister()" id="reg-btn" data-k="createBtn"></button>
+          <div class="divider" data-k="orDiv"></div>
+          <button class="btn secondary" onclick="switchTab('login')" data-k="haveAccount"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DETAIL ═══════════════ -->
+<div id="v-detail" class="view">
+  <div class="sec">
+    <button class="back-btn" onclick="goBack()">← <span data-k="back"></span></button>
+    <div class="dcard">
+      <div class="d-ico" id="d-ico"></div>
+      <div class="d-body">
+        <div class="d-title" id="d-title"></div>
+        <div class="d-price" id="d-price"></div>
+        <div class="d-info" id="d-info"></div>
+        <p class="d-desc" id="d-desc"></p>
+        <div class="info-box blue">
+          <div class="info-box-t">📍 <span data-k="locTitle"></span></div>
+          <div id="d-map" style="font-size:12px;margin-top:4px"></div>
+        </div>
+        <!-- CALENDAR -->
+        <div style="margin-bottom:1.25rem">
+          <div class="info-box-t" style="margin-bottom:8px">📅 <span data-k="availCal"></span></div>
+          <div class="cal-hdr">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+            <span id="cal-lbl" style="font-size:13px;font-weight:600"></span>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div class="cal-legend">
+            <span><div class="cal-dot" style="background:#e4f0e8;border:1px solid #aaa"></div><span data-k="calAvail"></span></span>
+            <span><div class="cal-dot" style="background:var(--rl)"></div><span data-k="calBooked"></span></span>
+            <span><div class="cal-dot" style="background:var(--a)"></div><span data-k="calSel"></span></span>
+          </div>
+        </div>
+        <!-- FEE BOX -->
+        <div class="fee-box" id="fee-box" style="display:none">
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px">💰 <span data-k="bookSummary"></span></div>
+          <div class="fee-row"><span data-k="rentalFee"></span><span id="f-rental"></span></div>
+          <div class="fee-row"><span data-k="deposit"></span><span id="f-dep-show"></span></div>
+          <div class="fee-row" style="color:var(--r)"><span data-k="platformFee"></span><span id="f-pfee"></span></div>
+          <div class="fee-row total"><span data-k="totalPay"></span><span id="f-total"></span></div>
+          <div style="font-size:11px;color:var(--txt3);margin-top:6px" data-k="depositNote"></div>
+        </div>
+        <!-- PAY METHOD -->
+        <div id="pay-pick" style="display:none;margin-bottom:1rem">
+          <div style="font-size:12px;font-weight:600;margin-bottom:8px" data-k="choosePay"></div>
+          <div class="pay-btns">
+            <div class="pay-opt" onclick="selectPay('airtel')" id="po-a"><div class="pay-opt-ico">📱</div><div class="pay-opt-lbl">Airtel Money</div></div>
+            <div class="pay-opt" onclick="selectPay('tnm')" id="po-t"><div class="pay-opt-ico">💚</div><div class="pay-opt-lbl">TNM Mpamba</div></div>
+          </div>
+        </div>
+        <!-- CONFIRM -->
+        <div class="confirm-box" id="confirm-box">
+          <h4>✅ <span data-k="payConfirmed"></span></h4>
+          <p style="font-size:12px;color:var(--g2);margin-bottom:6px" data-k="contactNow"></p>
+          <div class="phone-big" id="d-phone"></div>
+          <div style="font-size:12px;color:var(--txt2);margin-top:4px" id="d-wa-info"></div>
+          <button class="wa-btn" onclick="openWA()">💬 <span data-k="waBtn"></span></button>
+        </div>
+        <!-- AUTH GATE -->
+        <div class="auth-gate" id="auth-gate" style="display:none">
+          <div style="font-weight:700;font-size:13px;margin-bottom:5px;color:var(--ad)" data-k="loginToBook"></div>
+          <p style="font-size:12px;color:var(--ad);margin-bottom:10px" data-k="loginToBookDesc"></p>
+          <button class="btn green btn-sm" onclick="nav('account')"><span data-k="loginBtn"></span></button>
+        </div>
+        <div id="main-btn-wrap">
+          <button class="btn green" id="main-btn" onclick="handleBook()" data-k="selectDates"></button>
+        </div>
+        <!-- REVIEWS -->
+        <div style="margin-top:1.5rem;border-top:0.5px solid var(--bord);padding-top:1.25rem">
+          <div style="font-size:13px;font-weight:700;margin-bottom:0.75rem">⭐ <span data-k="reviews"></span> (<span id="rev-count">0</span>)</div>
+          <div id="rev-list"></div>
+          <div style="margin-top:1rem">
+            <div style="font-size:12px;font-weight:600;margin-bottom:6px" data-k="writeReview"></div>
+            <div class="star-pick" id="star-pick">
+              <button onclick="setStar(1)">☆</button><button onclick="setStar(2)">☆</button>
+              <button onclick="setStar(3)">☆</button><button onclick="setStar(4)">☆</button>
+              <button onclick="setStar(5)">☆</button>
+            </div>
+            <textarea class="fi fta" id="rev-text" style="min-height:60px;margin-bottom:6px" placeholder="Share your experience..."></textarea>
+            <button class="btn amber btn-sm" onclick="submitReview()" data-k="submitReview"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ADMIN ═══════════════ -->
+<div id="v-admin" class="view">
+  <div class="admin-wrap">
+    <!-- ADMIN LOGIN -->
+    <div id="admin-login-panel">
+      <div class="fcard" style="max-width:360px;margin-top:2rem">
+        <h2 class="f-title">🔐 Admin Access</h2>
+        <div id="admin-err" class="err-bar" style="display:none"></div>
+        <div class="fg"><label class="fl">Admin PIN</label><input class="fi" id="admin-pin" type="password" placeholder="Enter admin PIN" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+        <button class="btn green" onclick="doAdminLogin()">Enter Dashboard</button>
+        <div style="font-size:11px;color:var(--txt3);margin-top:0.75rem;text-align:center">Default PIN: <strong>1234</strong> (change after first login)</div>
+      </div>
+    </div>
+    <!-- ADMIN DASHBOARD -->
+    <div id="admin-dashboard" style="display:none">
+      <div class="admin-hdr">
+        <h2>⚙️ LendIt Malawi — Admin Dashboard</h2>
+        <p id="admin-welcome">Welcome, Administrator</p>
+      </div>
+      <div class="withdraw-box">
+        <h4>💰 Platform Fee Balance (Withdrawable)</h4>
+        <div class="withdraw-amount" id="admin-balance">MK 0</div>
+        <div style="font-size:12px;color:var(--ad);margin-top:4px">10% of all confirmed bookings</div>
+        <button class="btn amber btn-sm" style="margin-top:10px" onclick="simulateWithdraw()">Withdraw to Mobile Money</button>
+      </div>
+      <div class="admin-kpi">
+        <div class="kpi-card"><div class="kpi-num" id="k-members">0</div><div class="kpi-lbl">Total Members</div></div>
+        <div class="kpi-card"><div class="kpi-num" id="k-listings">0</div><div class="kpi-lbl">Total Listings</div></div>
+        <div class="kpi-card"><div class="kpi-num" id="k-bookings">0</div><div class="kpi-lbl">Total Bookings</div></div>
+        <div class="kpi-card"><div class="kpi-num" id="k-revenue">MK 0</div><div class="kpi-lbl">Total Revenue</div></div>
+      </div>
+      <div class="tab-nav">
+        <button class="tab-btn on" onclick="adminTab('listings')" id="at-listings">📦 All Listings</button>
+        <button class="tab-btn" onclick="adminTab('transactions')" id="at-transactions">💳 Transactions</button>
+        <button class="tab-btn" onclick="adminTab('members')" id="at-members">👥 Members</button>
+        <button class="tab-btn" onclick="adminTab('settings')" id="at-settings">⚙️ Settings</button>
+      </div>
+      <div id="admin-content"></div>
+      <div style="margin-top:1rem">
+        <button class="btn red-outline btn-sm" onclick="adminLogout()">Log Out of Admin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const EMOJIS={garden:'🌿',tools:'🔧',kitchen:'🍳',electronics:'⚡',transport:'🚲',events:'🎉'};
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_LBL=['Su','Mo','Tu','We','Th','Fr','Sa'];
+const ADMIN_PIN='1234';
+
+const TX={en:{
+home:'Home',browse:'Browse',listNav:'List Item',account:'Account',
+h1:'Share What You Own.',h2:'Borrow What You Need.',
+hsub:"Malawi's trusted asset lending community. Earn from idle items, borrow affordably.",
+hbrowse:'Browse Assets',hlist:'List Your Asset',viewAll:'View All Listings',
+locOff:'Location off — enable to see nearby items',enableLoc:'Enable GPS',locOn:'GPS active',
+sListings:'Listings',sUsers:'Members',sFee:'Platform Fee',sPay:'Mobile Money',
+hiw:'How It Works',
+s1t:'Create account',s1d:'Register free with your phone number.',
+s2t:'List your item',s2d:'Post with price, deposit and available dates.',
+s3t:'Borrower pays app',s3d:'Payment through LendIt — we keep 10% platform fee.',
+s4t:'Contacts revealed',s4d:'After payment both parties receive each other contacts.',
+featured:'Featured Listings',footLine:'Connecting communities across Malawi.',
+footSec:'All payments processed through LendIt. Lender contacts only revealed after payment.',
+listTitle:'List Your Asset',
+feeNoticeT:'How you get paid',feeNoticeD:'Borrowers pay through the app. You receive 90%. LendIt keeps 10%.',
+fName:'Asset Name',fDesc:'Description',fPrice:'Daily Rental Price (MK)',fDeposit:'Damage Deposit (MK)',
+fCat:'Category',fPay:'Payment Method',fBoth:'Both (Airtel & TNM)',fLoc:'Your Location',
+fIcon:'Item Icon',fSubmit:'Publish Listing',
+myListings:'My Listings',myAssets:'Assets',myBookings:'Bookings',earned:'Est. Earnings',
+addAsset:'+ Add Asset',logout:'Log Out',verified:'Verified Member',
+back:'Back',locTitle:'Listing Location',
+availCal:'Availability Calendar',calAvail:'Available',calBooked:'Booked',calSel:'Selected',
+bookSummary:'Booking Summary',rentalFee:'Rental fee',deposit:'Damage deposit',
+platformFee:'Platform fee (10%)',totalPay:'Total to pay',
+depositNote:'* Deposit refunded after item safely returned.',
+choosePay:'Choose payment method',payConfirmed:'Payment Confirmed!',
+contactNow:'Contact the lender now:',waBtn:'Chat on WhatsApp',
+loginToBook:'Login required to book',loginToBookDesc:'Create a free account to borrow items.',
+reviews:'Reviews',writeReview:'Leave a review',submitReview:'Post Review',
+selectDates:'Select Dates to Borrow',confirmPay:'Confirm & Pay',
+noResults:'No items found. Try a different search.',
+myEmpty:'No listings yet.',myEmptySub:'List something you own to start earning!',
+results:'results',dLoc:'Location',dCat:'Category',dOwner:'Owner',dDist:'Distance',
+distKm:'km away',distUnknown:'Unknown',perDay:'/ day',
+login:'Login',register:'Register',welcomeBack:'Welcome back',createAccount:'Create Account',
+phone:'Phone Number',password:'Password',confirmPw:'Confirm Password',
+firstName:'First Name',lastName:'Last Name',yourLoc:'Your City / Area',
+loginBtn:'Login to Account',createBtn:'Create Free Account',
+noAccount:"Don't have an account? Register",haveAccount:'Already have an account? Login',
+orDiv:'or',termsNote:'By registering you agree to use LendIt responsibly. Your phone is kept private.',
+cGarden:'Garden & Outdoor',cTools:'Tools & Equipment',cKitchen:'Kitchen & Cooking',
+cElec:'Electronics',cTransport:'Transport',cEvents:'Events & Party',catAll:'All',
+},
+ny:{
+home:'Nyumba',browse:'Sakaniza',listNav:'Lemba Chinthu',account:'Akaunti',
+h1:'Gawana Zimene Uli Nazo.',h2:'Tengera Zimene Ukufuna.',
+hsub:'Njira yokhulupilika yolendana zinthu ku Malawi.',
+hbrowse:'Sakaniza Zinthu',hlist:'Lemba Chinthu Chako',viewAll:'Onani Zonse',
+locOff:'GPS yachetsa',enableLoc:'Yatsa GPS',locOn:'GPS yatsa',
+sListings:'Zinthu',sUsers:'Mamembala',sFee:'Ndalama za App',sPay:'Mobile Money',
+hiw:'Mmene Zimakhalira',
+s1t:'Pangani akaunti',s1d:'Lembani mwaulere ndi nambala yanu.',
+s2t:'Lembani chinthu',s2d:'Yikani ndi mtengo, ndalama zotetezera.',
+s3t:'Wotengera alipira app',s3d:'Ndalama zimapita kudzera LendIt — tinatengera 10%.',
+s4t:'Nambala zikuuluka',s4d:'Pambuyo pa malipiro, onse awiri amalandira.',
+featured:'Zinthu Zotsankhidwa',footLine:'Kulumikiza anthu ku Malawi konse.',
+footSec:'Malipiro onse amapita kudzera LendIt.',
+listTitle:'Lemba Chinthu Chako',
+feeNoticeT:'Mmene mulandirira ndalama',feeNoticeD:'Otengera amalipira kudzera app. Mulandira 90%.',
+fName:'Dzina la Chinthu',fDesc:'Mfotokozero',fPrice:'Mtengo wa Tsiku (MK)',fDeposit:'Ndalama Zotetezera (MK)',
+fCat:'Mtundu',fPay:'Njira',fBoth:'Ziwiri',fLoc:'Malo Ako',fIcon:'Chithunzi',fSubmit:'Tumiza',
+myListings:'Zinthu Zanga',myAssets:'Zinthu',myBookings:'Zolandira',earned:'Ndalama Zapezeka',
+addAsset:'+ Yika Chinthu',logout:'Tulukani',verified:'Membala Wotsimikiziwa',
+back:'Bwerera',locTitle:'Malo a Chinthu',
+availCal:'Kalendala',calAvail:'Zilipo',calBooked:'Zalembedwa',calSel:'Sankhidwa',
+bookSummary:'Chisankho',rentalFee:'Ndalama',deposit:'Ndalama zotetezera',
+platformFee:'Ndalama za App (10%)',totalPay:'Chiwerengero',
+depositNote:'* Ndalama zotetezera zimabwezedwa.',
+choosePay:'Sankhani njira yolipira',payConfirmed:'Malipiro Atankhozedwa!',
+contactNow:'Lumikizanani ndi mwini:',waBtn:'Lankhulani pa WhatsApp',
+loginToBook:'Lowani kuti mutengere',loginToBookDesc:'Pangani akaunti mwaulere.',
+reviews:'Maganizo',writeReview:'Lembani maganizo',submitReview:'Tumiza',
+selectDates:'Sankhani Masiku',confirmPay:'Tsimikizani & Lipira',
+noResults:'Palibe zinthu.',
+myEmpty:'Mulibenso chinthu.',myEmptySub:'Lembani chinthu ndikupeza ndalama!',
+results:'zapezeka',dLoc:'Malo',dCat:'Mtundu',dOwner:'Mwini',dDist:'Kutali',
+distKm:'km kutali',distUnknown:'Sadziwa',perDay:'/ tsiku',
+login:'Lowani',register:'Lembani',welcomeBack:'Takulandirani',createAccount:'Pangani Akaunti',
+phone:'Nambala ya Foni',password:'Mawu Achinsinsi',confirmPw:'Tsimikizani Mawu',
+firstName:'Dzina',lastName:'Mzuko',yourLoc:'Dera Lanu',
+loginBtn:'Lowani mu Akaunti',createBtn:'Pangani Akaunti Mwaulere',
+noAccount:'Mulibe akaunti? Lembani',haveAccount:'Muli ndi akaunti? Lowani',
+orDiv:'kapena',termsNote:'Polembetsa mumvomera kugwiritsa ntchito LendIt bwino.',
+cGarden:'Munda',cTools:'Zida',cKitchen:'Komboni',cElec:'Magetsi',cTransport:'Mayendedwe',cEvents:'Zikondwerero',catAll:'Zonse',
+}};
+
+const SAMPLES=[
+  {id:1,name:'Lawn Mower',nameny:'Makina a Udzu',desc:'Electric lawn mower, well maintained. Perfect for medium gardens.',descny:'Makina ogema udzu abwino.',price:500,deposit:2000,location:'Lilongwe, Area 49',category:'garden',phone:'0881 234 567',payMethod:'airtel',owner:'Chimwemwe M.',emoji:'🌿',lat:-13.97,lng:33.79,bookedDates:[3,4,5,12,13],reviews:[{name:'Dalitso',stars:5,text:'Worked perfectly! Very clean machine.'}]},
+  {id:2,name:'Generator 2.5KVA',nameny:'Jenereta 2.5KVA',desc:'Reliable backup generator for home or events. Fuel not included.',descny:'Jenereta yotenthetsedwa bwino.',price:2000,deposit:8000,location:'Blantyre, Chilomoni',category:'electronics',phone:'0991 234 567',payMethod:'tnm',owner:'Takondwa B.',emoji:'⚡',lat:-15.79,lng:35.0,bookedDates:[6,7,20,21],reviews:[{name:'Grace',stars:4,text:'Great for our event!'}]},
+  {id:3,name:'4-Person Tent',nameny:'Tenti ya Anthu 4',desc:'Waterproof camping tent. Easy to set up.',descny:'Tenti yotetezera mvula.',price:800,deposit:3000,location:'Zomba',category:'events',phone:'0881 234 568',payMethod:'airtel',owner:'Mphatso K.',emoji:'⛺',lat:-15.39,lng:35.32,bookedDates:[10,11],reviews:[]},
+  {id:4,name:'Power Drill (Bosch)',nameny:'Diruwa la Magetsi',desc:'Bosch power drill with multiple bits. Perfect for home improvement.',descny:'Diruwa la Bosch ndi masomba ambiri.',price:300,deposit:1500,location:'Lilongwe, Kawale',category:'tools',phone:'0991 234 568',payMethod:'tnm',owner:'Dalitso N.',emoji:'🔧',lat:-13.95,lng:33.77,bookedDates:[],reviews:[{name:'Peter',stars:5,text:'Exactly what I needed!'}]},
+  {id:5,name:'HD Projector 1080p',nameny:'Pojekita ya HD',desc:'1080p projector with HDMI cable. Great for events or movie nights.',descny:'Pojekita ya 1080p.',price:1500,deposit:5000,location:'Mzuzu',category:'electronics',phone:'0881 234 569',payMethod:'airtel',owner:'Kondwani P.',emoji:'📽️',lat:-11.47,lng:34.02,bookedDates:[8,9,22],reviews:[]},
+  {id:6,name:'Stand Mixer 5L',nameny:'Makina a Kusakaniza',desc:'5L stand mixer. Bowl and attachments included.',descny:'Makina amphamvu ya 5L.',price:600,deposit:2500,location:'Blantyre, Limbe',category:'kitchen',phone:'0991 234 569',payMethod:'tnm',owner:'Chisomo W.',emoji:'🍳',lat:-15.81,lng:35.05,bookedDates:[14,15,16],reviews:[]},
+  {id:7,name:'Mountain Bicycle',nameny:'Njinga ya Mapiri',desc:'Adult mountain bike in excellent condition.',descny:'Njinga ya mapiri yomwe ili bwino.',price:400,deposit:2000,location:'Lilongwe, Biwi',category:'transport',phone:'0881 234 570',payMethod:'airtel',owner:'Yamikani C.',emoji:'🚲',lat:-13.98,lng:33.80,bookedDates:[1,2],reviews:[{name:'James',stars:4,text:'Great condition bike!'}]},
+  {id:8,name:'PA Sound System',nameny:'Sistema ya Phokoso',desc:'Complete PA: 2x15" speakers, amplifier, microphone and cables.',descny:'Sistema yonse ya phokoso.',price:3000,deposit:10000,location:'Blantyre, Ndirande',category:'events',phone:'0991 234 570',payMethod:'tnm',owner:'Agness M.',emoji:'🔊',lat:-15.82,lng:35.01,bookedDates:[17,18,19],reviews:[{name:'Moses',stars:5,text:'Professional quality for our wedding!'}]},
+];
+
+// STATE
+let lang='en', session=null, listings=[...SAMPLES], myListings=[];
+let userLat=null, userLng=null;
+let currentView='home', prevView='home';
+let selId=null, filterCat='all', searchQ='';
+let calYear, calMonth, selDays=[], payMethod=null, bookingDone=false, selStar=0;
+let notifications=[], memberCount=1;
+let transactions=[];
+let adminLoggedIn=false;
+
+// ─────────────────────────────────────────────
+// TRANSLATIONS
+// ─────────────────────────────────────────────
+function t(k){return TX[lang][k]||TX.en[k]||k;}
+function toggleLang(){lang=lang==='en'?'ny':'en';updateTexts();}
+function updateTexts(){
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    if(el.tagName==='OPTION')return;
+    const k=el.getAttribute('data-k');
+    if(k)el.textContent=t(k);
+  });
+  document.querySelectorAll('option[data-k]').forEach(o=>o.textContent=t(o.getAttribute('data-k')));
+  document.getElementById('lang-btn').textContent='🌐 '+(lang==='en'?'EN':'NY');
+  renderChips();renderHomeGrid();renderBrowseGrid();
+  document.getElementById('stat-n').textContent=listings.length;
+  document.getElementById('stat-users').textContent=memberCount;
+  updateNavUser();
+}
+
+// ─────────────────────────────────────────────
+// STORAGE
+// ─────────────────────────────────────────────
+async function loadStorage(){
+  try{
+    const r=await window.storage.get('lm-app-data');
+    if(r&&r.value){
+      const d=JSON.parse(r.value);
+      myListings=d.listings||[];
+      memberCount=d.memberCount||1;
+      notifications=d.notifications||[];
+      transactions=d.transactions||[];
+      listings=[...SAMPLES,...myListings];
+    }
+  }catch(e){}
+}
+async function saveStorage(){
+  try{
+    await window.storage.set('lm-app-data',JSON.stringify({
+      listings:myListings,memberCount,notifications,transactions
+    }));
+  }catch(e){}
+}
+
+// ─────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────
+async function hashPw(pw){
+  const enc=new TextEncoder();
+  const buf=await crypto.subtle.digest('SHA-256',enc.encode(pw+'lm-salt-2025'));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function doRegister(){
+  const first=document.getElementById('r-first').value.trim();
+  const last=document.getElementById('r-last').value.trim();
+  const phone=document.getElementById('r-phone').value.trim().replace(/\s/g,'');
+  const loc=document.getElementById('r-loc').value.trim();
+  const pw=document.getElementById('r-pw').value;
+  const pw2=document.getElementById('r-pw2').value;
+  const err=id=>showErr('reg-err',id);
+  document.getElementById('reg-err').style.display='none';
+  if(!phone)return err('Phone required');
+  if(!first||!last)return err('Name required');
+  if(!loc)return err('Location required');
+  if(pw.length<6)return err('Password must be at least 6 characters');
+  if(pw!==pw2)return err('Passwords do not match');
+  const btn=document.getElementById('reg-btn');
+  btn.innerHTML='<span class="spin"></span>Creating...';btn.disabled=true;
+  try{
+    const key=`lm-user:${phone}`;
+    let exists=false;
+    try{const ex=await window.storage.get(key);if(ex)exists=true;}catch(e){}
+    if(exists){showErr('reg-err','An account with this phone already exists');btn.textContent=t('createBtn');btn.disabled=false;return;}
+    const hash=await hashPw(pw);
+    const user={id:Date.now(),name:`${first} ${last}`.trim(),phone,location:loc,passwordHash:hash,joinedAt:new Date().toISOString()};
+    await window.storage.set(key,JSON.stringify(user));
+    memberCount++;await saveStorage();
+    session=user;
+    addNotif(user.id,'welcome','🎉 Welcome to LendIt Malawi!',`Hi ${first}! Your account is set up. Start by browsing listings or listing your first item.`);
+    onLogin();
+  }catch(e){showErr('reg-err','Something went wrong. Please try again.');btn.textContent=t('createBtn');btn.disabled=false;}
+}
+async function doLogin(){
+  const phone=document.getElementById('l-phone').value.trim().replace(/\s/g,'');
+  const pw=document.getElementById('l-pw').value;
+  document.getElementById('login-err').style.display='none';
+  if(!phone)return showErr('login-err','Phone number required');
+  if(!pw)return showErr('login-err','Password required');
+  const btn=document.getElementById('login-btn');
+  btn.innerHTML='<span class="spin"></span>Logging in...';btn.disabled=true;
+  try{
+    let userData=null;
+    try{const r=await window.storage.get(`lm-user:${phone}`);if(r)userData=JSON.parse(r.value);}catch(e){}
+    if(!userData){showErr('login-err','No account found with this phone. Please register.');btn.textContent=t('loginBtn');btn.disabled=false;return;}
+    const hash=await hashPw(pw);
+    if(hash!==userData.passwordHash){showErr('login-err','Incorrect password. Please try again.');btn.textContent=t('loginBtn');btn.disabled=false;return;}
+    session=userData;onLogin();
+  }catch(e){showErr('login-err','Something went wrong.');btn.textContent=t('loginBtn');btn.disabled=false;}
+}
+function onLogin(){
+  ['l-phone','l-pw'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['login-btn','reg-btn'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=id==='login-btn'?t('loginBtn'):t('createBtn');el.disabled=false;}});
+  updateNavUser();renderAccount();
+  updateNotifBadge();
+  nav('account');
+}
+function logout(){session=null;updateNavUser();renderAccount();nav('home');}
+function showErr(id,msg){const el=document.getElementById(id);if(el){el.textContent=msg;el.style.display='block';}}
+function switchTab(tab){
+  document.getElementById('auth-login').style.display=tab==='login'?'block':'none';
+  document.getElementById('auth-reg').style.display=tab==='register'?'block':'none';
+  document.getElementById('tab-login').classList.toggle('on',tab==='login');
+  document.getElementById('tab-reg').classList.toggle('on',tab==='register');
+  ['login-err','reg-err'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+}
+function updateNavUser(){
+  const lbl=document.getElementById('nav-user-lbl');
+  if(session){lbl.textContent=session.name.split(' ')[0];}
+  else{lbl.setAttribute('data-k','account');lbl.textContent=t('account');}
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function nav(view){
+  prevView=currentView;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  document.querySelectorAll('.nlink').forEach(b=>b.classList.remove('on'));
+  const vEl=document.getElementById('v-'+view);
+  if(vEl)vEl.classList.add('on');
+  const nb=document.getElementById('n-'+view);
+  if(nb)nb.classList.add('on');
+  currentView=view;
+  if(view==='browse')renderBrowseGrid();
+  if(view==='account')renderAccount();
+  if(view==='home'){renderHomeGrid();}
+  if(view==='admin'){if(!adminLoggedIn)showAdminLogin();}
+  window.scrollTo(0,0);
+}
+function goBack(){nav(prevView==='detail'?'browse':prevView);}
+function guardNav(view){
+  if(!session){
+    const msg=document.getElementById('auth-msg');
+    if(msg){msg.textContent=lang==='en'?'Please login or register to list an asset.':'Lowani kapena lembani kuti mulembe chinthu.';msg.style.display='block';}
+    nav('account');
+  } else nav(view);
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────────
+function addNotif(userId,type,title,body){
+  const notif={id:Date.now(),userId,type,title,body,read:false,createdAt:new Date().toISOString()};
+  notifications.unshift(notif);
+  if(notifications.length>100)notifications=notifications.slice(0,100);
+  saveStorage();
+  updateNotifBadge();
+}
+function updateNotifBadge(){
+  if(!session)return;
+  const unread=notifications.filter(n=>n.userId===session.id&&!n.read).length;
+  const badge=document.getElementById('notif-badge');
+  if(badge){badge.textContent=unread;badge.style.display=unread>0?'flex':'none';}
+}
+function openNotif(){
+  document.getElementById('notif-overlay').classList.add('on');
+  document.getElementById('notif-panel').classList.add('on');
+  renderNotifList();
+}
+function closeNotif(){
+  document.getElementById('notif-overlay').classList.remove('on');
+  document.getElementById('notif-panel').classList.remove('on');
+}
+function renderNotifList(){
+  const list=document.getElementById('notif-list');
+  if(!session){list.innerHTML='<div class="notif-empty">Login to see notifications</div>';return;}
+  const mine=notifications.filter(n=>n.userId===session.id);
+  if(!mine.length){list.innerHTML='<div class="notif-empty">No notifications yet.<br>You\'ll get alerts when someone books your item.</div>';return;}
+  list.innerHTML=mine.map(n=>`
+    <div class="notif-item ${n.read?'':'unread'}">
+      <div class="notif-item-t">${n.title}</div>
+      <div class="notif-item-d">${n.body}</div>
+      <div class="notif-item-time">${new Date(n.createdAt).toLocaleString()}</div>
+    </div>`).join('');
+}
+function markAllRead(){
+  if(!session)return;
+  notifications.forEach(n=>{if(n.userId===session.id)n.read=true;});
+  saveStorage();updateNotifBadge();renderNotifList();
+}
+
+// ─────────────────────────────────────────────
+// LOCATION
+// ─────────────────────────────────────────────
+function requestLoc(){
+  if(!navigator.geolocation){alert('GPS not available on this device.');return;}
+  navigator.geolocation.getCurrentPosition(p=>{
+    userLat=p.coords.latitude;userLng=p.coords.longitude;
+    document.getElementById('loc-dot').classList.add('on');
+    document.getElementById('loc-text').textContent=t('locOn');
+    document.getElementById('loc-btn').style.display='none';
+    renderHomeGrid();renderBrowseGrid();
+  },()=>alert('Could not access location. Please allow GPS in your browser settings.'));
+}
+function fillLoc(){
+  if(userLat){document.getElementById('f-loc').value=`${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;}
+  else requestLoc();
+}
+function distKm(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180,x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function getDistText(item){if(userLat&&item.lat)return `${Math.round(distKm(userLat,userLng,item.lat,item.lng))} ${t('distKm')}`;return null;}
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function stars(n,total=5){return '★'.repeat(Math.max(0,n))+'☆'.repeat(Math.max(0,total-n));}
+function avgStar(reviews){if(!reviews||!reviews.length)return 0;return Math.round(reviews.reduce((a,r)=>a+r.stars,0)/reviews.length);}
+function catLabel(c){const m={garden:'cGarden',tools:'cTools',kitchen:'cKitchen',electronics:'cElec',transport:'cTransport',events:'cEvents'};return t(m[c]||'cGarden');}
+
+// ─────────────────────────────────────────────
+// CARDS
+// ─────────────────────────────────────────────
+function cardHTML(item){
+  const name=lang==='ny'&&item.nameny?item.nameny:item.name;
+  const dt=getDistText(item);
+  const avg=avgStar(item.reviews);
+  return `<div class="card" onclick="openDetail(${item.id})">
+    <div class="card-ico">${item.emoji||EMOJIS[item.category]||'📦'}</div>
+    <div class="card-body">
+      <div class="card-name">${name}</div>
+      <div class="card-loc">📍 ${item.location}</div>
+      ${dt?`<div class="card-dist">📍 ${dt}</div>`:''}
+      <div class="card-price">MK ${item.price.toLocaleString()}<span> ${t('perDay')}</span></div>
+      <span class="cat-tag">${catLabel(item.category)}</span>
+      ${avg?`<div class="stars-sm">${stars(avg)} (${item.reviews.length})</div>`:''}
+    </div>
+  </div>`;
+}
+
+function renderHomeGrid(){
+  const g=document.getElementById('home-grid');if(!g)return;
+  let items=[...listings];
+  if(userLat)items.sort((a,b)=>(!a.lat?99:distKm(userLat,userLng,a.lat,a.lng))-(!b.lat?99:distKm(userLat,userLng,b.lat,b.lng)));
+  g.innerHTML=items.slice(0,6).map(cardHTML).join('');
+}
+
+function applyF(){searchQ=(document.getElementById('s-inp')||{}).value||'';renderBrowseGrid();}
+
+function setFilter(cat){
+  filterCat=cat;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat===cat));
+  renderBrowseGrid();
+}
+
+function renderChips(){
+  const cats=[['all','catAll'],['garden','cGarden'],['tools','cTools'],['kitchen','cKitchen'],['electronics','cElec'],['transport','cTransport'],['events','cEvents']];
+  const ch=document.getElementById('chips');
+  if(ch)ch.innerHTML=cats.map(([c,k])=>`<button class="chip${filterCat===c?' on':''}" data-cat="${c}" onclick="setFilter('${c}')">${t(k)}</button>`).join('');
+}
+
+function renderBrowseGrid(){
+  const q=searchQ.toLowerCase();
+  let items=listings.filter(i=>{
+    const n=(lang==='ny'&&i.nameny?i.nameny:i.name).toLowerCase();
+    const d=(lang==='ny'&&i.descny?i.descny:i.desc||'').toLowerCase();
+    return(!q||n.includes(q)||d.includes(q)||i.location.toLowerCase().includes(q))&&(filterCat==='all'||i.category===filterCat);
+  });
+  if(userLat)items.sort((a,b)=>(!a.lat?99:distKm(userLat,userLng,a.lat,a.lng))-(!b.lat?99:distKm(userLat,userLng,b.lat,b.lng)));
+  const rc=document.getElementById('res-count');
+  if(rc)rc.textContent=`${items.length} ${t('results')}`;
+  const g=document.getElementById('browse-grid');
+  if(g)g.innerHTML=items.length?items.map(cardHTML).join(''):`<div style="text-align:center;padding:3rem;color:var(--txt2)">${t('noResults')}</div>`;
+}
+
+// ─────────────────────────────────────────────
+// DETAIL
+// ─────────────────────────────────────────────
+function openDetail(id){
+  selId=id;selDays=[];payMethod=null;bookingDone=false;selStar=0;
+  const now=new Date();calYear=now.getFullYear();calMonth=now.getMonth();
+  renderDetail();prevView=currentView;nav('detail');
+}
+function renderDetail(){
+  const item=listings.find(l=>l.id===selId);if(!item)return;
+  const name=lang==='ny'&&item.nameny?item.nameny:item.name;
+  const desc=lang==='ny'&&item.descny?item.descny:item.desc;
+  document.getElementById('d-ico').textContent=item.emoji||'📦';
+  document.getElementById('d-title').textContent=name;
+  document.getElementById('d-price').innerHTML=`MK ${item.price.toLocaleString()} <span style="font-size:13px;font-weight:400;color:var(--txt3);font-family:system-ui">${t('perDay')}</span>`;
+  document.getElementById('d-desc').textContent=desc||'';
+  const dt=getDistText(item);
+  document.getElementById('d-info').innerHTML=`
+    <div><label>${t('dLoc')}</label><p>${item.location}</p></div>
+    <div><label>${t('dCat')}</label><p>${catLabel(item.category)}</p></div>
+    <div><label>${t('dOwner')}</label><p>${item.owner||'Anonymous'}</p></div>
+    <div><label>${t('dDist')}</label><p>${dt||t('distUnknown')}</p></div>`;
+  document.getElementById('d-map').innerHTML=item.lat?`📍 ${item.lat.toFixed(4)}°S, ${item.lng.toFixed(4)}°E &mdash; ${item.location}`:`📍 ${item.location}`;
+  document.getElementById('confirm-box').classList.remove('on');
+  document.getElementById('fee-box').style.display='none';
+  document.getElementById('pay-pick').style.display='none';
+  document.getElementById('auth-gate').style.display='none';
+  document.getElementById('main-btn-wrap').style.display='block';
+  renderCal();renderReviews();updateMainBtn();
+}
+
+// ─────────────────────────────────────────────
+// CALENDAR
+// ─────────────────────────────────────────────
+function renderCal(){
+  const item=listings.find(l=>l.id===selId);if(!item)return;
+  document.getElementById('cal-lbl').textContent=`${MONTHS[calMonth]} ${calYear}`;
+  const first=new Date(calYear,calMonth,1).getDay();
+  const dim=new Date(calYear,calMonth+1,0).getDate();
+  const today=new Date();
+  let html=DAY_LBL.map(d=>`<div class="cal-lbl">${d}</div>`).join('');
+  for(let i=0;i<first;i++)html+=`<div class="cal-d empty"></div>`;
+  for(let d=1;d<=dim;d++){
+    const booked=(item.bookedDates||[]).includes(d);
+    const sel=selDays.includes(d);
+    const past=new Date(calYear,calMonth,d)<new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    const isToday=today.getDate()===d&&today.getMonth()===calMonth&&today.getFullYear()===calYear;
+    let cls='cal-d';
+    if(past||booked)cls+=' unavail';
+    else if(sel)cls+=' sel';
+    else cls+=' avail';
+    if(isToday)cls+=' today';
+    const click=(past||booked)?'':`onclick="toggleDay(${d})"`;
+    html+=`<div class="${cls}" ${click}>${d}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+}
+function toggleDay(d){
+  if(bookingDone)return;
+  const i=selDays.indexOf(d);
+  if(i>-1)selDays.splice(i,1);else selDays.push(d);
+  selDays.sort((a,b)=>a-b);
+  renderCal();updateFeeBox();updateMainBtn();
+}
+function changeMonth(dir){
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCal();
+}
+
+// ─────────────────────────────────────────────
+// BOOKING & PAYMENT
+// ─────────────────────────────────────────────
+function updateFeeBox(){
+  const item=listings.find(l=>l.id===selId);
+  const fb=document.getElementById('fee-box');
+  const pp=document.getElementById('pay-pick');
+  if(!item||!selDays.length){if(fb)fb.style.display='none';if(pp)pp.style.display='none';return;}
+  if(fb)fb.style.display='block';
+  if(pp)pp.style.display=session?'block':'none';
+  const rental=item.price*selDays.length;
+  const dep=item.deposit||0;
+  const pfee=Math.round(rental*0.1);
+  const total=rental+dep+pfee;
+  document.getElementById('f-rental').textContent=`MK ${rental.toLocaleString()} (${selDays.length} day${selDays.length>1?'s':''})`;
+  document.getElementById('f-dep-show').textContent=`MK ${dep.toLocaleString()}`;
+  document.getElementById('f-pfee').textContent=`MK ${pfee.toLocaleString()}`;
+  document.getElementById('f-total').textContent=`MK ${total.toLocaleString()}`;
+}
+function selectPay(m){
+  payMethod=m;
+  document.getElementById('po-a').classList.toggle('on',m==='airtel');
+  document.getElementById('po-t').classList.toggle('on',m==='tnm');
+  updateMainBtn();
+}
+function updateMainBtn(){
+  const btn=document.getElementById('main-btn');
+  const gate=document.getElementById('auth-gate');
+  const wrap=document.getElementById('main-btn-wrap');
+  if(!btn)return;
+  if(bookingDone){wrap.style.display='none';return;}
+  if(!selDays.length){btn.textContent=t('selectDates');btn.disabled=false;gate.style.display='none';wrap.style.display='block';return;}
+  if(!session){gate.style.display='block';wrap.style.display='none';return;}
+  gate.style.display='none';wrap.style.display='block';
+  btn.textContent=t('confirmPay');
+  btn.disabled=!payMethod;
+}
+function handleBook(){
+  if(!selDays.length)return;
+  if(!session){nav('account');return;}
+  if(!payMethod){alert(t('choosePay'));return;}
+  const item=listings.find(l=>l.id===selId);if(!item)return;
+  bookingDone=true;
+  item.bookedDates=[...(item.bookedDates||[]),...selDays];
+  // Record transaction
+  const rental=item.price*selDays.length;
+  const pfee=Math.round(rental*0.1);
+  const tx={id:Date.now(),itemId:item.id,itemName:item.name,borrowerName:session.name,borrowerPhone:session.phone,ownerId:item.userId||null,ownerName:item.owner,days:selDays.length,rental,deposit:item.deposit||0,platformFee:pfee,total:rental+(item.deposit||0)+pfee,payMethod,date:new Date().toISOString()};
+  transactions.unshift(tx);
+  // Notify lender (if they are a registered user)
+  if(item.userId){
+    addNotif(item.userId,'booking',`📦 New booking: ${item.name}`,`${session.name} has booked your "${item.name}" for ${selDays.length} day(s). Total: MK ${tx.rental.toLocaleString()}. They will contact you shortly.`);
+  }
+  document.getElementById('confirm-box').classList.add('on');
+  document.getElementById('d-phone').textContent=item.phone||'Contact via app';
+  document.getElementById('d-wa-info').textContent=`${payMethod==='airtel'?'Airtel Money':'TNM Mpamba'}: ${item.phone}`;
+  document.getElementById('main-btn-wrap').style.display='none';
+  renderCal();saveStorage();
+}
+function openWA(){
+  const item=listings.find(l=>l.id===selId);if(!item)return;
+  const p=(item.phone||'').replace(/\s/g,'');
+  const msg=encodeURIComponent(`Hi ${item.owner}, I just confirmed a booking for "${item.name}" on LendIt Malawi for ${selDays.length} day(s). Please confirm the pickup time. — ${session?session.name:'LendIt Borrower'}`);
+  window.open(`https://wa.me/265${p.replace(/^0/,'')}?text=${msg}`,'_blank');
+}
+
+// ─────────────────────────────────────────────
+// REVIEWS
+// ─────────────────────────────────────────────
+function renderReviews(){
+  const item=listings.find(l=>l.id===selId);if(!item)return;
+  const revs=item.reviews||[];
+  document.getElementById('rev-count').textContent=revs.length;
+  const rl=document.getElementById('rev-list');
+  if(!revs.length){rl.innerHTML=`<div style="font-size:12px;color:var(--txt2);margin-bottom:0.5rem">No reviews yet. Be the first!</div>`;return;}
+  rl.innerHTML=revs.map(r=>`<div class="review-card"><div class="review-top"><div class="avatar">${r.name.charAt(0).toUpperCase()}</div><div><div style="font-weight:600;font-size:13px">${r.name}</div><div style="color:var(--a);font-size:12px">${stars(r.stars)}</div></div></div><p style="font-size:12px;color:var(--txt2);line-height:1.5">${r.text}</p></div>`).join('');
+}
+function setStar(n){
+  selStar=n;
+  document.querySelectorAll('#star-pick button').forEach((b,i)=>b.textContent=i<n?'★':'☆');
+}
+function submitReview(){
+  const item=listings.find(l=>l.id===selId);if(!item)return;
+  const text=document.getElementById('rev-text').value.trim();
+  if(!selStar||!text){alert('Please give a star rating and write something.');return;}
+  const name=session?session.name.split(' ')[0]:'Anonymous';
+  if(!item.reviews)item.reviews=[];
+  item.reviews.unshift({name,stars:selStar,text});
+  document.getElementById('rev-text').value='';setStar(0);renderReviews();saveStorage();
+}
+
+// ─────────────────────────────────────────────
+// LIST ASSET
+// ─────────────────────────────────────────────
+async function submitListing(){
+  if(!session){guardNav('list');return;}
+  const name=document.getElementById('f-name').value.trim();
+  const price=parseInt(document.getElementById('f-price').value)||0;
+  const dep=parseInt(document.getElementById('f-dep').value)||0;
+  const loc=document.getElementById('f-loc').value.trim();
+  if(!name||!price||!loc){alert(t('errFill')||'Please fill all required fields.');return;}
+  const btn=document.getElementById('list-btn');
+  btn.innerHTML='<span class="spin"></span>Publishing...';btn.disabled=true;
+  const item={
+    id:Date.now(),name,desc:document.getElementById('f-desc').value.trim()||name,
+    price,deposit:dep,location:loc,
+    category:document.getElementById('f-cat').value,
+    payMethod:document.getElementById('f-pay').value,
+    owner:session.name,phone:session.phone,
+    emoji:document.getElementById('f-emoji').value,
+    lat:userLat,lng:userLng,
+    bookedDates:[],reviews:[],userId:session.id
+  };
+  myListings.push(item);listings.push(item);
+  await saveStorage();
+  ['f-name','f-desc','f-price','f-dep','f-loc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  btn.textContent=t('fSubmit');btn.disabled=false;
+  const sb=document.getElementById('s-bar');
+  if(sb){sb.textContent=`✓ "${name}" published successfully! It's now live for borrowers to find.`;sb.style.display='block';setTimeout(()=>sb.style.display='none',6000);}
+  document.getElementById('stat-n').textContent=listings.length;
+  // Notify lender
+  addNotif(session.id,'listed','✅ Asset Listed!',`Your "${name}" is now live on LendIt Malawi at MK ${price.toLocaleString()}/day. Borrowers can now find and book it.`);
+}
+
+// ─────────────────────────────────────────────
+// ACCOUNT / PROFILE
+// ─────────────────────────────────────────────
+function renderAccount(){
+  const inEl=document.getElementById('acct-in');
+  const outEl=document.getElementById('acct-out');
+  if(session){
+    inEl.style.display='block';outEl.style.display='none';
+    const initials=session.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('p-avatar').textContent=initials;
+    document.getElementById('p-name').textContent=session.name;
+    document.getElementById('p-phone').textContent='📱 '+session.phone;
+    document.getElementById('p-loc').textContent='📍 '+(session.location||'');
+    const mine=myListings.filter(l=>l.userId===session.id);
+    const bookings=mine.reduce((s,l)=>s+(l.bookedDates||[]).length,0);
+    const earned=mine.reduce((s,l)=>s+l.price*(l.bookedDates||[]).length*0.9,0);
+    document.getElementById('p-assets').textContent=mine.length;
+    document.getElementById('p-bookings').textContent=bookings;
+    document.getElementById('p-earned').textContent='MK '+Math.round(earned).toLocaleString();
+    renderMine(mine);
+  } else {
+    inEl.style.display='none';outEl.style.display='block';
+  }
+}
+function renderMine(items){
+  const ml=document.getElementById('mine-list');if(!ml)return;
+  if(!items||!items.length){ml.innerHTML=`<div class="empty"><div class="empty-ico">📦</div><p style="font-weight:600">${t('myEmpty')}</p><p style="font-size:12px;margin-top:4px">${t('myEmptySub')}</p></div>`;return;}
+  ml.innerHTML=items.map(item=>`<div class="my-card" onclick="openDetail(${item.id})"><div class="my-card-ico">${item.emoji||'📦'}</div><div class="my-card-info"><div style="font-weight:600;font-size:13px">${item.name}</div><div style="font-size:12px;color:var(--ad)">MK ${item.price.toLocaleString()} ${t('perDay')}</div><div style="font-size:11px;color:var(--txt2)">📍 ${item.location}</div></div><span class="badge-active">✓ Active</span></div>`).join('');
+}
+
+// ─────────────────────────────────────────────
+// ADMIN
+// ─────────────────────────────────────────────
+function showAdminLogin(){
+  nav('admin');
+  document.getElementById('admin-login-panel').style.display='block';
+  document.getElementById('admin-dashboard').style.display='none';
+}
+function doAdminLogin(){
+  const pin=document.getElementById('admin-pin').value;
+  if(pin===ADMIN_PIN){
+    adminLoggedIn=true;
+    document.getElementById('admin-login-panel').style.display='none';
+    document.getElementById('admin-dashboard').style.display='block';
+    renderAdminDashboard();
+  } else {
+    showErr('admin-err','Incorrect PIN. Please try again.');
+  }
+}
+function adminLogout(){adminLoggedIn=false;nav('home');}
+function adminTab(tab){
+  ['listings','transactions','members','settings'].forEach(t=>{
+    document.getElementById('at-'+t).classList.toggle('on',t===tab);
+  });
+  renderAdminContent(tab);
+}
+function renderAdminDashboard(){
+  const totalBookings=transactions.length+SAMPLES.reduce((s,i)=>s+(i.bookedDates||[]).length,0);
+  const totalRevenue=transactions.reduce((s,tx)=>s+tx.rental,0);
+  const totalPFee=transactions.reduce((s,tx)=>s+tx.platformFee,0);
+  document.getElementById('k-members').textContent=memberCount;
+  document.getElementById('k-listings').textContent=listings.length;
+  document.getElementById('k-bookings').textContent=totalBookings;
+  document.getElementById('k-revenue').textContent='MK '+totalRevenue.toLocaleString();
+  document.getElementById('admin-balance').textContent='MK '+totalPFee.toLocaleString();
+  renderAdminContent('listings');
+}
+function renderAdminContent(tab){
+  const el=document.getElementById('admin-content');if(!el)return;
+  if(tab==='listings'){
+    if(!listings.length){el.innerHTML='<div class="empty">No listings yet.</div>';return;}
+    el.innerHTML=`<table class="admin-table">
+      <thead><tr><th>Item</th><th>Owner</th><th>Location</th><th>Price/day</th><th>Bookings</th><th>Status</th></tr></thead>
+      <tbody>${listings.map(l=>`<tr>
+        <td>${l.emoji||'📦'} ${l.name}</td>
+        <td>${l.owner||'—'}</td>
+        <td>${l.location}</td>
+        <td>MK ${l.price.toLocaleString()}</td>
+        <td>${(l.bookedDates||[]).length}</td>
+        <td><span class="status-dot green"></span>Active</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } else if(tab==='transactions'){
+    if(!transactions.length){el.innerHTML='<div class="empty">No transactions yet. Transactions appear when borrowers confirm bookings.</div>';return;}
+    el.innerHTML=`<table class="admin-table">
+      <thead><tr><th>Date</th><th>Item</th><th>Borrower</th><th>Rental</th><th>Platform Fee</th><th>Payment</th></tr></thead>
+      <tbody>${transactions.map(tx=>`<tr>
+        <td>${new Date(tx.date).toLocaleDateString()}</td>
+        <td>${tx.itemName}</td>
+        <td>${tx.borrowerName}</td>
+        <td>MK ${tx.rental.toLocaleString()} (${tx.days}d)</td>
+        <td style="color:var(--g);font-weight:600">MK ${tx.platformFee.toLocaleString()}</td>
+        <td>${tx.payMethod==='airtel'?'Airtel':'TNM'}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } else if(tab==='members'){
+    el.innerHTML=`<div class="info-box green"><div class="info-box-t">👥 Member Overview</div><p style="font-size:12px">Total registered members: <strong>${memberCount}</strong>. Member details are stored securely. Passwords are SHA-256 encrypted.</p></div>
+    <table class="admin-table">
+      <thead><tr><th>Name</th><th>Listings</th><th>Est. Earnings</th></tr></thead>
+      <tbody>${myListings.reduce((acc,l)=>{const found=acc.find(a=>a.uid===l.userId);if(found){found.count++;found.earn+=l.price*(l.bookedDates||[]).length*0.9;}else acc.push({uid:l.userId,name:l.owner,count:1,earn:l.price*(l.bookedDates||[]).length*0.9});return acc;},[]).map(u=>`<tr><td>${u.name}</td><td>${u.count}</td><td>MK ${Math.round(u.earn).toLocaleString()}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--txt2)">No registered lenders yet.</td></tr>'}</tbody>
+    </table>`;
+  } else if(tab==='settings'){
+    el.innerHTML=`<div class="fcard" style="max-width:480px;margin:0">
+      <h2 class="f-title">⚙️ Platform Settings</h2>
+      <div class="fg"><label class="fl">Platform Fee (%)</label><input class="fi" type="number" value="10" min="1" max="30" placeholder="10"></div>
+      <div class="fg"><label class="fl">Platform Name</label><input class="fi" type="text" value="LendIt Malawi"></div>
+      <div class="fg"><label class="fl">Admin Airtel Money Number</label><input class="fi" type="tel" placeholder="08X XXXX XXX" value="0881 000 001"></div>
+      <div class="fg"><label class="fl">Admin TNM Mpamba Number</label><input class="fi" type="tel" placeholder="09X XXXX XXX" value="0991 000 001"></div>
+      <div class="info-box amber" style="font-size:12px"><strong>🔐 Change Admin PIN</strong><br>Currently: 1234. Update this in the source code before going live.</div>
+      <button class="btn green" onclick="alert('Settings saved! (In live version these will update the database.)')">Save Settings</button>
+    </div>`;
+  }
+}
+function simulateWithdraw(){
+  const bal=transactions.reduce((s,tx)=>s+tx.platformFee,0);
+  if(bal===0){alert('No balance to withdraw yet.');return;}
+  alert(`✅ Withdrawal of MK ${bal.toLocaleString()} initiated to your Airtel Money / TNM Mpamba number. In the live version this will process instantly.`);
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+async function init(){
+  await loadStorage();
+  updateTexts();
+  renderHomeGrid();
+  renderBrowseGrid();
+  document.getElementById('stat-n').textContent=listings.length;
+  document.getElementById('stat-users').textContent=memberCount;
+}
+init();
+</script>
+</body>
+</html>
